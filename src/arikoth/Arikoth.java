@@ -3,6 +3,7 @@ package arikoth;
 import arc.*;
 import arc.math.*;
 import arc.util.*;
+import arikoth.content.otherPlanets.SerpuloUnits;
 import arikoth.content.otherPlanets.*;
 import arikoth.graphics.ArikothShaderf;
 import arikoth.graphics.ArikothShaders;
@@ -24,23 +25,24 @@ public class Arikoth extends Mod{
 
     @Override
     public void loadContent(){
+        ArikothTeams.load();
         ArikothShaders.load();
         ArikothInnerBlocks.load();
-        ArikothTeams.load();
         ArikothSounds.load();
-        ArikothAttribute.load();
         ArikothLiquids.load();
         ArikothItems.load();
         ArikothUnitTypes.load();
         ArikothBlocks.load();
-        ArikothPlanets.load();
-        ArikothSectors.load();
-        ArikothTechTree.load();
 
         VanillaStatusEffects.load();
         SerpuloItems.load();
+        SerpuloLiquids.load();
+        SerpuloUnits.load();
         SerpuloBlocks.load();
         TechTreeContent.load();
+        ArikothPlanets.load();
+        ArikothSectors.load();
+        ArikothTechTree.load();
         GhereonTech.load();
 
         EnvRenderer.init();

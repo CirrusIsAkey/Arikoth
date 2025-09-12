@@ -20,13 +20,13 @@ public class ArikothItems {
             cost = 1f;
         }};
         strontium = new Item("strontium", Color.valueOf("#e3987b")) {{
-            hardness = 2;
+            hardness = 1;
             cost = 2f;
             flammability = 0.25f;
             explosiveness = 0.12f;
         }};
         quartz = new Item("quartz", Color.valueOf("#c4bdb9")) {{
-            hardness = 2;
+            hardness = 1;
             cost = 2f;
             charge = 0.5f;
         }};
@@ -35,15 +35,15 @@ public class ArikothItems {
             cost = 2.5f;
             charge = 0.1f;
         }};
-        irium = new Item("irium", Color.valueOf("#bbb8db")) {{
+        irium = new Item("irium", Color.valueOf("#ffe9cf")) {{
             hardness = 3;
             cost = 3.5f;
             charge = 0.5f;
         }};
-        tyrium = new Item("tyrium", Color.valueOf("#8bbeb0")) {{
+        tyrium = new Item("tyrium", Color.valueOf("#feffe8")) {{
             hardness = 1;
             cost = 3.8f;
-            charge = 1.2f;
+            charge = 0;
             radioactivity = 1;
         }};
         kaneturium = new Item("kaneturium", Color.valueOf("#adb8ba")) {{

@@ -18,6 +18,7 @@ public class ArikothLiquids {
             viscosity = 0.3f;
             explosiveness = 0.2f;
             temperature = 0.4f;
+            gas = true;
         }};
         liquidQuickSand = new Liquid("liquid-quicksand"){{
             color = Color.valueOf("fadab2");

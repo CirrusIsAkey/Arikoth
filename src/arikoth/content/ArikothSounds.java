@@ -14,7 +14,8 @@ public class ArikothSounds {
             weakGunTwo = new Sound(),
             rotorWhir = new Sound(),
             smallShot = new Sound(),
-            steamHiss = new Sound();
+            steamHiss = new Sound(),
+            sniperShot = new Sound();
 
 
     public static void load(){
@@ -24,6 +25,7 @@ public class ArikothSounds {
         rotorWhir = loadSound("rotorWhir");
         smallShot = loadSound("smallShot");
         steamHiss = loadSound("steamHiss");
+        sniperShot = loadSound("sniperShot");
     }
 
 

@@ -1,17 +1,26 @@
 package arikoth.world.blocks;
 
-import arc.Core;
-import arc.graphics.g2d.TextureRegion;
-import arc.util.Eachable;
-import mindustry.entities.units.BuildPlan;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.util.*;
+import mindustry.entities.units.*;
+import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.storage.CoreBlock;
-import mindustry.world.draw.DrawBlock;
+import mindustry.world.draw.*;
 
+// something's approaching something's approaching something's approaching something's approaching something's approaching something's approaching something's approaching something's approaching
 public class DrawerCore extends CoreBlock {
+    public DrawBlock drawer;
+
     public DrawerCore(String name) {
         super(name);
     }
-    public DrawBlock drawer;
+
+    @Override
+    public void load() {
+        super.load();
+        drawer.load(this);
+    }
 
     @Override
     public TextureRegion[] icons() {
@@ -23,4 +32,15 @@ public class DrawerCore extends CoreBlock {
         drawer.drawPlan(this, plan, list);
     }
 
+    public class DrawerCoreBuild extends CoreBuild {
+        @Override
+        public void draw() {
+            drawer.draw(this);
+        }
+
+        @Override
+        public float totalProgress() {
+            return totalProgress();
+        }
+    }
 }

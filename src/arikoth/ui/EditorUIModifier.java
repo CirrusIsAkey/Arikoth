@@ -2,8 +2,6 @@ package arikoth.ui;
 
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arikoth.Arikoth;
-import arikoth.content.ArikothTeams;
 import mindustry.content.Blocks;
 import mindustry.game.*;
 import mindustry.gen.*;

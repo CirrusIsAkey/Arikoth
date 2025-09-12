@@ -16,11 +16,11 @@ import static mindustry.Vars.*;
 import mindustry.content.StatusEffects.*;
 
 public class VanillaStatusEffects{
-    public static StatusEffect fluxed;
+    public static StatusEffect fluxed, blight;
 
     public static void load(){
 
-        fluxed = new StatusEffect("arikoth-fluxed"){{
+        fluxed = new StatusEffect("fluxed"){{
             color = Color.valueOf("ffc455");
             damage = 0.2f;
             speedMultiplier = 0.8f;
@@ -36,6 +36,33 @@ public class VanillaStatusEffects{
                 lifetime = 15;
                 line = true;
                 interp = Interp.circleOut;
+                particles = 5;
+            }};
+            transitionDamage = 2f;
+
+            init(() -> {
+                affinity(StatusEffects.shocked, (unit, result, time) -> {
+                    unit.damagePierce(transitionDamage);
+                    Fx.circleColorSpark.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
+                    result.set(fluxed, Math.min(time + result.time, 300f));
+                });
+            });
+        }};
+
+        blight = new StatusEffect("blight"){{
+            color = Color.valueOf("ffc455");
+            damage = 0.12f;
+            speedMultiplier = 1.2f;
+            reloadMultiplier = 0.9f;
+            effect = new ParticleEffect(){{
+                sizeFrom =  5;
+                sizeTo = 0;
+                length = 30;
+                colorFrom = Color.valueOf("875778");
+                colorTo = Color.valueOf("5c3b52aa");
+                lifetime = 90;
+                interp = Interp.pow5Out;
+                sizeInterp = Interp.pow5In;
                 particles = 5;
             }};
             transitionDamage = 2f;

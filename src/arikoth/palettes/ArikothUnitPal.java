@@ -16,6 +16,8 @@ public class ArikothUnitPal {
     scoutBlueDark = Color.valueOf("618cb8"),
     specialistPurple = Color.valueOf("e1bdff"),
     specialistPurpleDark = Color.valueOf("9e82c4"),
+    cryo = Color.valueOf("#c2ede2"),
+    cryoDark = Color.valueOf("#84c1c2"),
     //items
     //effects
     fireOrange = Color.valueOf("#ff831f"),

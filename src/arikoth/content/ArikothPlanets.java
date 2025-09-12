@@ -7,12 +7,15 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arikoth.content.otherPlanets.SerpuloBlocks;
 import arikoth.planet.maps.ColorPass;
 import arikoth.planet.maps.HeightPass;
 import arikoth.world.meta.ArikothEnv;
 import mindustry.content.Blocks;
+import mindustry.content.Planets;
 import mindustry.content.Weathers;
 import mindustry.game.Gamemode;
+import mindustry.game.Team;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.planet.*;
@@ -22,7 +25,7 @@ import mindustry.world.meta.*;
 import arikoth.planet.*;;
 
 public class ArikothPlanets {
-    public static Planet acithar, mesarius, halchyin, arikoth, zealor, hypheru, kargithar, tauix, eres, kelthir, derath;
+    public static Planet acithar, mesarius, halchyin, arikoth, zealor, hypheru, kargithar, tauix, eres, kelthir, derath, ghereon, mekerir, celecar, niliux;
 
     public static void load(){
         acithar = new Planet("Acithar", null, 8f){{
@@ -65,6 +68,7 @@ public class ArikothPlanets {
                     new HexSkyMesh(this, 69, 2.4f, 0.12f, 5, Color.valueOf("f7cba4").a(0.75f), 3, 0.7f, 1f, 0.45f)
             );
 
+            solarSystem = acithar;
             alwaysUnlocked = true;
             accessible = true;
             allowLaunchToNumbered = false;
@@ -77,7 +81,7 @@ public class ArikothPlanets {
             prebuildBase = false;
             defaultCore = ArikothBlocks.coreSerenity;
 
-            defaultEnv = Env.oxygen | Env.terrestrial | Env.groundOil;
+            defaultEnv = ArikothEnv.desert | Env.oxygen | Env.terrestrial | Env.groundOil;
 
             orbitSpacing = 1;
             drawOrbit = true;
@@ -96,13 +100,11 @@ public class ArikothPlanets {
             ruleSetter = r -> {
                 r.waveTeam = ArikothTeams.conquisitoris;
                 r.showSpawns = true;
-                r.defaultTeam = ArikothTeams.luxis;
+                r.defaultTeam = Team.malis;
                 r.teams.get(r.waveTeam).rtsAi = false;
 
                 r.weather.addAll(
-                        new Weather.WeatherEntry(Weathers.sandstorm){{
-                            always = true;
-                        }}
+                        new Weather.WeatherEntry(Weathers.sandstorm)
                 );
 
                 if(r.mode() == Gamemode.attack || r.mode() == Gamemode.pvp){
@@ -121,6 +123,78 @@ public class ArikothPlanets {
             gen.carbonChance = 0.01f;
             gen.max += 2;
         });
+
+        ghereon = new Planet("Ghereon", Planets.sun, 2f, 3){{
+            generator = new GhereonPlanetGenerator();
+
+            meshLoader = () -> new HexMesh(this, 5);
+            cloudMeshLoader = () -> new MultiMesh(
+                    new HexSkyMesh(this, 33, 2f, 0.13f, 5, Color.valueOf("bf6783").a(0.75f), 3, 0.7f, 1f, 0.43f),
+                    new HexSkyMesh(this, 34, 2.4f, 0.12f, 5, Color.valueOf("f56e81").a(0.75f), 3, 0.7f, 1f, 0.3f)
+            );
+
+            solarSystem = Planets.sun;
+            alwaysUnlocked = true;
+            accessible = true;
+            allowLaunchToNumbered = false;
+            allowLaunchLoadout = false;
+            allowSectorInvasion = false;
+            startSector = 24;
+            allowWaveSimulation = true;
+            clearSectorOnLose = true;
+            allowWaves = true;
+            prebuildBase = false;
+            defaultCore = ArikothBlocks.coreSerenity;
+
+            defaultEnv = ArikothEnv.corrupted | Env.oxygen | Env.terrestrial | Env.groundOil;
+
+            orbitSpacing = 1;
+            drawOrbit = true;
+            orbitRadius = 40;
+            rotateTime = 12 * 60;
+
+            atmosphereRadIn = 0;
+            atmosphereRadOut = 0.3f;
+            sectorSeed = 1204;
+            bloom = false;
+            visible = true;
+            atmosphereColor = Color.valueOf("bf6783");
+            iconColor = Color.valueOf("bf6783");
+            hasAtmosphere = true;
+
+            ruleSetter = r -> {
+                r.waveTeam = Team.crux;
+                r.showSpawns = true;
+                r.defaultTeam = Team.sharded;
+                r.teams.get(r.waveTeam).rtsAi = false;
+                r.ambientLight = Color.valueOf("96434e20");
+
+                if(r.mode() == Gamemode.attack || r.mode() == Gamemode.pvp){
+                }
+            };
+        }};
+
+        mekerir = makeAsteroid("Mekerir", ghereon, SerpuloBlocks.crimsonSandWall, SerpuloBlocks.obsidianWall, 25, 0.2f, 4, 0.1f, gen -> {
+            gen.berylChance = 0.8f;
+            gen.iceChance = 0f;
+            gen.carbonChance = 0.01f;
+            gen.max += 2;
+        });
+
+        derath = makeAsteroid("Derath", ghereon, SerpuloBlocks.crimsonSandWall, SerpuloBlocks.obsidianWall, 28, 0.2f, 2, 0.2f, gen -> {
+            gen.berylChance = 0.8f;
+            gen.iceChance = 0f;
+            gen.carbonChance = 0.01f;
+            gen.max += 2;
+        });
+
+        niliux = makeAsteroid("Niliux", ghereon, SerpuloBlocks.purplematWall, SerpuloBlocks.obsidianWall, 55, 0.4f, 3, 0.6f, gen -> {
+            gen.berylChance = 0.8f;
+            gen.iceChance = 0f;
+            gen.carbonChance = 0.01f;
+            gen.max += 2;
+        });
+
     }
     private static Planet makeAsteroid(String name, Planet parent, Block base, Block tint, int seed, float tintThresh, int pieces, float scale, Cons<AsteroidGenerator> cgen){
         return new Planet(name, parent, 0.12f){{

@@ -2,9 +2,11 @@
 package arikoth.content;
 
 import arc.struct.Seq;
+import mindustry.content.Liquids;
 import mindustry.game.Objectives;
 
 import static arikoth.content.ArikothLiquids.*;
+import static mindustry.content.Liquids.*;
 import static mindustry.content.SectorPresets.facility32m;
 import static mindustry.content.TechTree.*;
 import static arikoth.content.ArikothBlocks.*;
@@ -18,23 +20,25 @@ public class ArikothTechTree {
         arikoth.techTree = nodeRoot("arikoth", coreSerenity, false, () -> {
             node(rhenium, Seq.with(new Objectives.OnSector(awakening)), ()-> {
                 node(nickel, Seq.with(new Objectives.Research(rhenium)),  ()-> {
-                    node(thorium, ()-> {
-                        node(tyrium, ()-> {
-                        });
-                        node(kaneturium, ()-> {
-                        });
-                    });
                     node(strontium, ()-> {
                     });
                 });
-                node(quartz, ()-> {
-                    node(irium, ()-> {
-                    });
-                    node(silicon, ()-> {
-                    });
-                });
+                node(sand, ()-> {
+                            node(quartz, () -> {
+                                node(silicon, () -> {
+                                });
+                            });
+                        });
                 node(liquidQuickSand, ()-> {
                     node(mercury, ()-> {
+                        node(Liquids.slag, ()-> {
+                            node(ozone, ()-> {
+                                node(blastCompound, ()-> {
+                                });
+                            });
+                            node(irium, ()-> {
+                            });
+                        });
                         node(amalgam, ()-> {
                         });
                     });
@@ -54,7 +58,7 @@ public class ArikothTechTree {
             });
 
             node(puncture, ()-> {
-                node(seeker, Seq.with(new Objectives.OnSector(sagar)), ()-> {
+                node(calefex, /*Seq.with(new Objectives.OnSector(sagar))*/ ()-> {
                 });
             });
 
@@ -72,20 +76,9 @@ public class ArikothTechTree {
                 });
             });
 
-            node(mercurySynthesizer, Seq.with(new Objectives.Produce(silicon)), ()-> {
-
-                node(amalgamFoundry, Seq.with(
-                new Objectives.Research(mercurySynthesizer),
-                new Objectives.Produce(mercury),
-                new Objectives.Produce(quartz)
-                ), ()-> {
-                });
-                node(tyriumWeaver, Seq.with(
-                new Objectives.Produce(amalgam),
-                new Objectives.Research(thorium),
-                new Objectives.Produce(irium)
-                ), ()-> {
-                });
+            node(amalgamFoundry, Seq.with(
+            new Objectives.Research(strontium)
+            ), ()-> {
             });
             node(awakening, ()-> {
                 node(sagar, Seq.with(new Objectives.SectorComplete(awakening)), ()-> {

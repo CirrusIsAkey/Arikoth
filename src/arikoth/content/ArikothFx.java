@@ -10,10 +10,12 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.Tmp;
 import arikoth.math.Parallax;
+import arikoth.palettes.ArikothTurretPal;
 import arikoth.palettes.ArikothUnitPal;
 import mindustry.entities.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
@@ -285,44 +287,159 @@ public class ArikothFx {
 
                 Drawf.light(e.x, e.y, circleRad * 1f, ArikothUnitPal.mechOrange, e.fout());
             }),
-            howtizerSmoke = new Effect(90f, e -> {
-        rand.setSeed(e.id);
+            calefexSmoke = new Effect(90f, 200f, b -> {
+                float intensity = 1.5f;
 
-        Draw.blend(Blending.additive);
-        Parallax.getParallaxFrom(
-                temp.set(e.x + rand.range(0f), e.y + rand.range(10f)),
-                Core.camera.position,
-                rand.random(0f, 10f) * e.finpow()
-        );
-        Draw.color(ArikothUnitPal.assaultGold, ArikothUnitPal.assaultGoldDark, rand.random(1f));
-        Draw.alpha(e.foutpowdown());
-        Fill.circle(temp.x, temp.y, rand.random(6f, 8f));
-        Draw.blend();
-         }),
-            colorCharge = new Effect(90f, 100f, e -> {
+                color(b.color, 0.6f);
+                for(int i = 0; i < 3; i++){
+                    rand.setSeed(b.id*2 + i);
+                    float lenScl = rand.random(0.5f, 1f);
+                    int fi = i;
+                    b.scaled(b.lifetime * lenScl, e -> {
+                        randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 6f * intensity, (x, y, in, out) -> {
+                            float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                            float rad = fout * ((2f + intensity) * 2.35f);
+
+                            Fill.circle(e.x + x, e.y + y, rad);
+                            Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                        });
+                    });
+                }
+            }),
+            calefexSmokeLarge = new Effect(90f, 200f, b -> {
+                float intensity = 2f;
+
+                color(b.color, 0.6f);
+                for(int i = 0; i < 3; i++){
+                    rand.setSeed(b.id*2 + i);
+                    float lenScl = rand.random(0.5f, 1f);
+                    int fi = i;
+                    b.scaled(b.lifetime * lenScl, e -> {
+                        randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 11f * intensity, (x, y, in, out) -> {
+                            float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                            float rad = fout * ((2f + intensity) * 2.35f);
+
+                            Fill.circle(e.x + x, e.y + y, rad);
+                            Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                        });
+                    });
+                }
+            }),
+            calefexExplosion = new Effect(30f, 160f, e -> {
                 color(e.color);
-                stroke(e.fin() * 2f);
-                Lines.circle(e.x, e.y, 4f + e.fout() * 100f);
+                stroke(e.fout() * 3f);
+                float circleRad = 6f + e.finpow() * 15f;
+                Lines.circle(e.x, e.y, circleRad);
 
-                Fill.circle(e.x, e.y, e.fin() * 20);
+                rand.setSeed(e.id);
+                for(int i = 0; i < 4; i++){
+                    float angle = rand.random(360f);
+                    float lenRand = rand.random(0.5f, 1f);
+                    Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 5f * rand.random(1f, 0.6f) + 2f, e.finpow() * 25f * lenRand + 6f);
+                }
+            }),
+            calefexExplosionLarge = new Effect(30f, 160f, e -> {
+                color(e.color);
+                stroke(e.fout() * 3f);
+                float circleRad = 6f + e.finpow() * 25f;
+                Lines.circle(e.x, e.y, circleRad);
 
-                randLenVectors(e.id, 20, 40f * e.fout(), (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fin() * 5f);
-                    Drawf.light(e.x + x, e.y + y, e.fin() * 15f, e.color, 0.7f);
+                rand.setSeed(e.id);
+                for(int i = 0; i < 4; i++){
+                    float angle = rand.random(360f);
+                    float lenRand = rand.random(0.5f, 1f);
+                    Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 5f * rand.random(1f, 0.6f) + 2f, e.finpow() * 35f * lenRand + 6f);
+                }
+            }),
+            augmentExplosion = new Effect(120f, 200f, b -> {
+                float intensity = 3f;
+
+                color(b.color, 0.5f);
+                for(int i = 0; i < 3; i++){
+                    rand.setSeed(b.id*2 + i);
+                    float lenScl = rand.random(0.5f, 1f);
+                    int fi = i;
+                    b.scaled(b.lifetime * lenScl, e -> {
+                        randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 11f * intensity, (x, y, in, out) -> {
+                            float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                            float rad = fout * ((2f + intensity) * 2.35f);
+
+                            Fill.circle(e.x + x, e.y + y, rad);
+                            Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                        });
+                    });
+                }
+            }),
+            augmentExplosionLarge = new Effect(120f, 200f, b -> {
+                float intensity = 4f;
+
+                color(b.color, 0.5f);
+                for(int i = 0; i < 3; i++){
+                    rand.setSeed(b.id*2 + i);
+                    float lenScl = rand.random(0.5f, 1f);
+                    int fi = i;
+                    b.scaled(b.lifetime * lenScl, e -> {
+                        randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 11f * intensity, (x, y, in, out) -> {
+                            float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                            float rad = fout * ((2f + intensity) * 2.35f);
+
+                            Fill.circle(e.x + x, e.y + y, rad);
+                            Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                        });
+                    });
+                }
+            }),
+            augmentExplosionWave = new Effect(45f, 224f, e -> {
+                color(e.color);
+                stroke(e.fout() * 3f);
+                float circleRad = 6f + e.finpow() * 60f;
+                Lines.circle(e.x, e.y, circleRad);
+
+                rand.setSeed(e.id);
+                for(int i = 0; i < 8; i++){
+                    float angle = rand.random(360f);
+                    float lenRand = rand.random(0.5f, 1f);
+                    Lines.lineAngle(e.x, e.y, angle, e.foutpow() * 10f * rand.random(1f, 0.6f) + 2f, e.finpow() * 60f * lenRand + 6f);
+                }
+            }),
+            pyroclastSmoke = new Effect(90f, 200f, b -> {
+                float intensity = 0.75f;
+
+                color(b.color, 0.6f);
+                for(int i = 0; i < 2; i++){
+                    rand.setSeed(b.id*2 + i);
+                    float lenScl = rand.random(0.5f, 1f);
+                    int fi = i;
+                    b.scaled(b.lifetime * lenScl, e -> {
+                        randLenVectors(e.id + fi - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 6f * intensity, (x, y, in, out) -> {
+                            float fout = e.fout(Interp.pow5Out) * rand.random(0.5f, 1f);
+                            float rad = fout * ((2f + intensity) * 2.35f);
+
+                            Fill.circle(e.x + x, e.y + y, rad);
+                            Drawf.light(e.x + x, e.y + y, rad * 2.5f, b.color, 0.5f);
+                        });
+                    });
+                }
+            }),
+            largeFireballsmoke = new Effect(25f, e -> {
+                color(Color.gray);
+
+                randLenVectors(e.id, 1, 6f + e.fin() * 7f, (x, y) -> {
+                    Fill.circle(e.x + x, e.y + y, 0.6f + e.fout() * 1.5f);
+                });
+            }),
+            largeFireHit = new Effect(35f, e -> {
+                color(Pal.lightFlame, Pal.darkFlame, e.fin());
+
+                randLenVectors(e.id, 4, 6f + e.fin() * 10f, (x, y) -> {
+                    Fill.circle(e.x + x, e.y + y, 0.6f + e.fout() * 1.6f);
                 });
 
                 color();
+            }),
+            icherRegenParticle = new Effect(120f, e -> {
+                color(ArikothTurretPal.icherLight);
 
-                Fill.circle(e.x, e.y, e.fin() * 10);
-                Drawf.light(e.x, e.y, e.fin() * 20f, e.color, 0.7f);
-            }).followParent(true).rotWithParent(true),
-            sparkBomb = new Effect(12, e -> {
-                color(e.color);
-                stroke(e.fout() * 1.5f);
-
-                randLenVectors(e.id, 12, e.finpow() * 20f, (x, y) -> {
-                    float ang = Mathf.angle(x, y);
-                    lineAngle(e.x + x, e.y + y, ang, e.fout() * rand.random(8f, 4f));
-                });
+                Fill.poly(e.x, e.y, 6,  e.fslope() * 2f + 0.14f, 0);
             });
 }

@@ -8,19 +8,21 @@ public class ArikothTurretPal {
             turretOutline = Color.valueOf("#302926"),
             arikothTurretHeat = Color.valueOf("#ff0000"),
     //ammo
-            rheniumLight = Color.valueOf("#f2dba7"),
+            rheniumLight = Color.valueOf("#ffebbf"),
             rheniumTrail = Color.valueOf("#d6be88"),
             nickelLight = Color.valueOf("#b0a9a1"),
-            nickelTrial = Color.valueOf("#969089"),
-            strontiumLight = Color.valueOf("#e3987b"),
-            strontiumTrail = Color.valueOf("#a65e5a"),
+            nickelTrail = Color.valueOf("#969089"),
+            strontiumLight = Color.valueOf("#ffae70"),
+            strontiumTrail = Color.valueOf("#c7704d"),
             quartzLight = Color.valueOf("#c4bdb9"),
             quartzTrail = Color.valueOf("#96908d"),
             amalgamLight = Color.valueOf("#cebee8"),
             amalgamTrail = Color.valueOf("#9e8dbf"),
-            iriumLight = Color.valueOf("#bbb8db"),
-            iriumTrail = Color.valueOf("#817ea6"),
-            tyriumLight = Color.valueOf("#8bbeb0"),
-            tyriumTrail = Color.valueOf("#5e988d");
+            iriumLight = Color.valueOf("#d6b48b"),
+            iriumTrail = Color.valueOf("#ffe9cf"),
+            tyriumTrail = Color.valueOf("#d9db9a"),
+            tyriumLight = Color.valueOf("#feffe8"),
+    //liquid
+            icherLight = Color.valueOf("fff1a1");
 
 }
