@@ -5,8 +5,6 @@ import arc.math.*;
 import arc.util.*;
 import arikoth.content.otherPlanets.SerpuloUnits;
 import arikoth.content.otherPlanets.*;
-import arikoth.graphics.ArikothShaderf;
-import arikoth.graphics.ArikothShaders;
 import arikoth.graphics.EnvRenderer;
 import mindustry.game.*;
 import mindustry.mod.*;
@@ -26,12 +24,12 @@ public class Arikoth extends Mod{
     @Override
     public void loadContent(){
         ArikothTeams.load();
-        ArikothShaders.load();
         ArikothInnerBlocks.load();
         ArikothSounds.load();
         ArikothLiquids.load();
         ArikothItems.load();
         ArikothUnitTypes.load();
+        ArikothLifeformUnitTypes.load();
         ArikothBlocks.load();
 
         VanillaStatusEffects.load();
@@ -41,9 +39,9 @@ public class Arikoth extends Mod{
         SerpuloBlocks.load();
         TechTreeContent.load();
         ArikothPlanets.load();
-        ArikothSectors.load();
-        ArikothTechTree.load();
         GhereonTech.load();
+
+    //    RecipeRegister.load();
 
         EnvRenderer.init();
     }

@@ -1,20 +1,17 @@
 package arikoth.content;
 
-import arc.Core;
-import arc.graphics.Blending;
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Rect;
+import arc.util.Time;
 import arc.util.Tmp;
-import arikoth.Arikoth;
-import arikoth.math.Parallax;
+import arikoth.content.effects.ArikothFx;
+import arikoth.content.effects.ArikothTurretFx;
 import arikoth.palettes.ArikothTurretPal;
 import arikoth.palettes.ArikothUnitPal;
-import arikoth.palettes.VanillaPal;
 import arikoth.world.entities.bullets.*;
 import arikoth.world.type.LightEngine;
 import mindustry.ai.types.*;
@@ -33,35 +30,34 @@ import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.type.unit.MissileUnitType;
 import mindustry.type.unit.TankUnitType;
+import mindustry.type.weapons.BuildWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.randLenVectors;
-import static arikoth.content.ArikothFx.rand;
-import static arikoth.content.ArikothFx.temp;
+import static arikoth.content.effects.ArikothFx.rand;
 import static mindustry.content.Fx.*;
-import static mindustry.gen.Sounds.boom;
-import static mindustry.gen.Sounds.explosionbig;
 
 public class ArikothUnitTypes {
 
     public static UnitType
 
             //Core
+            pioneer,
             vision, seeker, overseer,
             //Assault
             bolt, hasp, frame, edifice, cathedral,
             //spider-assault
             cavalier, knight, sabreur, phalanx, dragoon,
             //hover cruisers
-            kindle, calxel, redox, mesa, sahara,
+            kindle, calxel, redox, weld, conflagration,
             //scout copters
             messenger, nomad, outrider, vanguard, oracle,
             //scout tanks
-            draft, zephyr, squall, derecho, hurricane,
+            draft, squall, zephyr, derecho, hurricane,
             //specialist spider thingy
-            react, decay, fissile, ionize, nucleon, positron,
+            react, decay, fissile, dominion, nucleon, positron,
             //hybrids
             //airships
             iracund, aggravate, cantankerous,
@@ -76,15 +72,15 @@ public class ArikothUnitTypes {
             speed = 0.9f;
             hitSize = 12f;
             mechStepParticles = true;
-            health = 820;
+            health = 620;
             armor = 6;
             weapons.add(new Weapon(
                 "arikoth-bolt-weapon"){{
-                reload = 10;
+                reload = 20;
                 x = -6f;
                 y = 0f;
                 top = false;
-                shootSound = Sounds.shootSnap;
+                shootSound = Sounds.shootAltLong;
                 ejectEffect = casing1;
                 bullet = new BasicBulletType(6, 20){{
                     speed = 6;
@@ -116,68 +112,35 @@ public class ArikothUnitTypes {
             armor = 8;
             weapons.add(new Weapon(
                     "arikoth-hasp-weapon"){{
-                reload = 15;
+                reload = 35;
                 alternate = true;
                 x = 8f;
                 y = 0f;
-                shootY = 12;
+                shootY = 10;
                 inaccuracy = 4;
                 top = false;
-                shootSound = Sounds.flame;
-                ejectEffect = Fx.none;
-                for(int i = 0; i < 5; i++){
-                    int fi = i;
-                    parts.add(new RegionPart("-spine"){{
-                        x = -2f;
-                        y = 21f / 4f - 45f / 4f * fi / 4f;
-                        moveX = 21f / 4f + Mathf.slope(fi / 4f) * 1.25f;
-                        moveRot = 10f - fi * 14f;
-                        float fin = fi  / 4f;
-                        progress = PartProgress.reload.inv().mul(1.3f).add(0.1f).sustain(fin * 0.34f, 0.14f, 0.14f);
-                        layerOffset = -0.001f;
-                        mirror = false;
-                    }});
-                }
-                bullet = new ContinuousFlameBulletType(){{
-                    length = 30;
+                shootSound = Sounds.bang;
+                ejectEffect = casing3;
+                shoot.shots = 4;
+                shoot.shotDelay = 6;
+                bullet = new BasicBulletType(6, 40){{
+                    speed = 6;
                     damage = 40;
-                    width = 4;
-                    flareRotSpeed = 0;
-                    flareColor = hitColor = ArikothUnitPal.assaultGoldDark;
-                    lifetime = 13f;
-                    pierce = true;
-                    pierceArmor = true;
-                    pierceBuilding = true;
-                    pierceCap = 2;
-                    colors = new Color[]{ArikothUnitPal.assaultGoldDark, ArikothUnitPal.assaultGold, Color.white};
-                    shootEffect = new MultiEffect(
-                    new Effect(25, e -> {
-                        color(e.color, Color.gray, e.fin());
-
-                        rand.setSeed(e.id);
-                        for(int i = 0; i < 12; i++){
-                            float rot = e.rotation + rand.range(30f);
-                            v.trns(rot, rand.random(e.finpow() * 42f));
-                            Fill.poly(e.x + v.x, e.y + v.y, 6, e.fout() * 6f + 0.2f, rand.random(360f));
-                        };
-                    }),
-                    new Effect(25, e -> {
-                        color(e.color, ArikothUnitPal.assaultGoldDark, e.fin());
-
-                        rand.setSeed(e.id);
-                        for(int i = 0; i < 12; i++){
-                            float rot = e.rotation + rand.range(30f);
-                            v.trns(rot, rand.random(e.finpow() * 42f));
-                            Fill.poly(e.x + v.x, e.y + v.y, 6, e.fout() * 3f + 0.2f, rand.random(360f));
-                        };
-                    })
-                    );
-                    hitEffect = Fx.hitFlameSmall;
-                    despawnEffect = Fx.none;
-                    status = StatusEffects.burning;
-                    statusDuration = 60f * 2;
-                    keepVelocity = false;
-                    hittable = false;
+                    splashDamage = 30;
+                    splashDamageRadius = 18;
+                    width = 8;
+                    height = 12;
+                    trailWidth = 2;
+                    trailLength = 10;
+                    trailColor = backColor = hitColor = lightColor = Pal.redLight;
+                    frontColor = Color.white;
+                    lifetime = 25;
+                    hitSound = Sounds.none;
+                    shootEffect = shootBigColor;
+                    smokeEffect = shootBigSmoke;
+                    hitEffect = hitBulletColor;
+                    despawnEffect = none;
+                    despawnHit = true;
                 }};
             }});
         }};
@@ -185,42 +148,189 @@ public class ArikothUnitTypes {
         frame = new UnitType("frame"){{
             researchCostMultiplier = 0.5f;
             outlineColor = mechLegColor = ArikothUnitPal.unitOutline;
+            outlineRadius = 4;
             constructor = MechUnit::create;
-            speed = 0.7f;
-            hitSize = 24f;
+            speed = 0.6f;
+            stepShake = 1.2f;
+            hitSize = 28f;
             mechStepParticles = true;
-            health = 2300;
+            health = 5230;
             armor = 12;
-            weapons.add(new Weapon(
+            weapons.addAll(
+                new Weapon(
                     "arikoth-frame-weapon"){{
-                reload = 120f;
-                x = 11f;
+                reload = 90f;
+                x = 67 / 4f;
                 y = 0f;
                 shake = 6;
                 shootY = 12;
                 top = false;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.dullExplosion;
                 ejectEffect = Fx.casing4;
-                inaccuracy = 4;
-                velocityRnd = 0.4f;
-                shoot = new ShootSpread(8,2.5f);
-                bullet = new BasicBulletType(8, 20){{
-                    speed = 6;
-                    damage = 30;
-                    width = 12;
+                inaccuracy = 3;
+                recoil = 2;
+                for(int j = 0; j < 4; j++){
+                    int i = j;
+                    parts.add(new RegionPart("-spine"){{
+                        layerOffset = -0.01f;
+                        heatLayerOffset = 0.005f;
+                        x = -1f;
+                        y = -2;
+                        moveX = 2.5f + i * 1.9f;
+                        moveY = 8f + -4f * i;
+                        moveRot = 40f - i * 25f;
+                        rotation = -90;
+                        progress = PartProgress.warmup.delay(i * 0.2f);
+                        heatProgress = p -> Mathf.absin(Time.time + i * 14f, 7f, 1f);
+
+                        heatColor = Pal.techBlue;
+                    }});
+                }
+                bullet = new  BasicBulletType(8f, 70, "shell"){{
+                    splashDamage = 60;
+                    splashDamageRadius = 32;
+                    width = 24;
+                    height = 24;
+                    drag = 0.01f;
+                    trailWidth = 4f;
+                    trailLength = 18;
+                    trailColor = backColor = hitColor = lightColor = ArikothUnitPal.assaultGold;
+                    frontColor = Color.white;
+                    lifetime = 20;
+                    hitSound = Sounds.bang;
+                    intervalBullets = 1;
+                    bulletInterval = 3;
+                    intervalBullet = new BasicBulletType(4f, 10, "missile-large"){{
+                    frontColor = Color.white;
+                    trailColor = backColor = hitColor = ArikothUnitPal.assaultGold;
+                    trailWidth = 2;
+                    trailLength = 12;
+                    width = 8;
                     height = 12;
-                    trailWidth = 2.5f;
-                    trailLength = 10;
-                    trailColor = backColor = hitColor = lightColor = frontColor = ArikothUnitPal.assaultGold;
-                    lifetime = 15;
-                    hitSound = Sounds.none;
-                    shootEffect = shootSmallColor;
-                    smokeEffect = shootSmallSmoke;
-                    hitEffect = hitBulletColor;
+                    lifetime = 20;
+                    pierceCap = 6;
+                    drag = 0.01f;
+                    trailInterval = 1;
+                    trailRotation = true;
+                    trailEffect = disperseTrail;
+                    hitEffect = despawnEffect = new MultiEffect(blastExplosion, hitBulletColor);
+                    }};
+                    fragBullets = 8;
+                    fragBullet = new BasicBulletType(4f, 10, "missile-large"){{
+                        frontColor = Color.white;
+                        trailColor = backColor = hitColor = ArikothUnitPal.assaultGold;
+                        trailWidth = 2;
+                        trailLength = 12;
+                        width = 8;
+                        height = 12;
+                        lifetime = 25;
+                        pierceCap = 6;
+                        drag = 0.01f;
+                        trailInterval = 1;
+                        trailRotation = true;
+                        trailEffect = disperseTrail;
+                        hitEffect = despawnEffect = new MultiEffect(blastExplosion, hitBulletColor);
+                    }};
+                    shootEffect = new MultiEffect(ArikothTurretFx.shootSparkLarge, ArikothTurretFx.shootLargeColor);
+                    smokeEffect = ArikothTurretFx.shootSmokeHexagonLargeSparse;
+                    hitEffect = new MultiEffect(
+                       ArikothTurretFx.hitLargeBulletColor,
+                       new ExplosionEffect(){{
+                           lifetime = 20f;
+                           waveStroke = 2f;
+                           waveColor = sparkColor = trailColor;
+                           waveRad = 12f;
+                           smokeSize = 0f;
+                           smokeSizeBase = 0f;
+                           sparks = 16;
+                           sparkRad = 35f;
+                           sparkLen = 4f;
+                           sparkStroke = 1.5f;
+                       }}
+                    );
                     despawnEffect = none;
                     despawnHit = true;
                 }};
-            }});
+            }},new Weapon(
+                    "arikoth-frame-gunner"){{
+                reload = 10f;
+                x = 0;
+                y = -8f;
+                layerOffset = 0.002f;
+                rotate = true;
+                rotationLimit = 90;
+                rotateSpeed = 2.5f;
+                shake = 2;
+                shootY = 9;
+                top = false;
+                shootSound = Sounds.bolt;
+                ejectEffect = Fx.casing4;
+                inaccuracy = 4;
+                recoils = 2;
+                mirror = false;
+                shoot = new ShootAlternate(5);
+                parts.add(new RegionPart("-front-l"){{
+                    moveY = -2;
+                    progress = PartProgress.recoil;
+                    recoilIndex = 0;
+                    under = true;
+                }});
+                parts.add(new RegionPart("-front-r"){{
+                    moveY = -2;
+                    progress = PartProgress.recoil;
+                    recoilIndex = 1;
+                    under = true;
+                }});
+                bullet = new RailBulletType(){{
+                    damage = 20;
+                    length = 120;
+                    hitColor = ArikothUnitPal.assaultGold;
+                    endEffect = new Effect(14f, e -> {
+                        color(e.color);
+                        Drawf.tri(e.x, e.y, e.fout() * 1.5f, 5f, e.rotation);
+                    });
+
+                    shootEffect = new Effect(10, e -> {
+                        color(e.color);
+                        float w = 1.2f + 7 * e.fout();
+                        Drawf.tri(e.x, e.y, w, 30f * e.fout(), e.rotation);
+                        color(e.color);
+
+                        for(int i : Mathf.signs){
+                            Drawf.tri(e.x, e.y, w * 0.9f, 12f * e.fout(), e.rotation + i * 90f);
+                        }
+                        Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
+                    });
+                    pointEffectSpace = 6;
+                    pointEffect = new MultiEffect( new ParticleEffect(){{
+                        lenFrom = 10;
+                        lenTo = 3;
+                        length = 10;
+                        lifetime = 25;
+                        colorFrom = Pal.redDust;
+                        colorTo = Color.white;
+                        line = true;
+                        cone = 0;
+                        particles = 1;
+                        baseLength = 2;
+                        rotWithParent = true;
+                    }},
+                    new ParticleEffect(){{
+                        lenFrom = 10;
+                        lenTo = 3;
+                        length = 10;
+                        lifetime = 25;
+                        colorFrom = Pal.redderDust;
+                        colorTo = Pal.redDust;
+                        line = true;
+                        cone = 0;
+                        particles = 1;
+                        baseLength = 2;
+                        rotWithParent = true;
+                    }});
+                }};
+            }}
+            );
         }};
 
         edifice = new UnitType("edifice"){{
@@ -417,7 +527,7 @@ public class ArikothUnitTypes {
             rotateSpeed = 3.5f;
 
             accel = 0.08f;
-            health = 600f;
+            health = 510f;
             armor = 1f;
             hitSize = 11f;
             engineSize = 0f;
@@ -447,18 +557,22 @@ public class ArikothUnitTypes {
                 mirror = false;
                 reload = 20f;
                 shootCone = 20f;
-                shoot = new ShootAlternate(6);
+                shoot = new ShootAlternate(6){{
+                    shots = 2;
+                }};
 
                 bullet = new BasicBulletType(){{
-                    damage = 20;
+                    damage = 10;
                     speed = 4;
                     width = 8f;
                     height = 12;
+                    weaveMag = 2;
+                    weaveScale = 2;
                     trailWidth = 2;
                     trailLength = 12;
-                    lifetime = 30f;
-                    shootEffect = Fx.colorSparkBig;
-                    smokeEffect = Fx.shootSmokeSquareSparse;
+                    lifetime = 10f;
+                    shootEffect = ArikothTurretFx.shootSparkSmall;
+                    smokeEffect = ArikothTurretFx.shootSmokeSquareSmallSparse;
                     hitColor = trailColor = backColor = ArikothUnitPal.assaultGold;
                     frontColor = Color.white;
                     hitEffect = despawnEffect = new Effect(25, e -> {
@@ -467,7 +581,7 @@ public class ArikothUnitTypes {
                         rand.setSeed(e.id);
                         for(int i = 0; i < 6; i++){
                             float rot = e.rotation + rand.range(360f);
-                            v.trns(rot, rand.random(e.finpow() * 21f));
+                            v.trns(rot, rand.random(e.finpow() * 12f));
                             Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 4f + 0.2f, rand.random(360f));
                         };
                     });
@@ -521,179 +635,23 @@ public class ArikothUnitTypes {
             engines.add(new LightEngine(-0, -14, 7f, -90, 0.45f, 0.6f, 2.6f));
 
             weapons.add(new Weapon("placeholder weapon"){{
-                shootSound = Sounds.cannon;
-                chargeSound = Sounds.lasercharge2;
+                shootSound = Sounds.torch;
                 y = 6f;
                 x = 0f;
                 top = true;
                 mirror = false;
-                reload = 120f;
                 shootCone = 20f;
-                shake = 6;
-                shootStatus = StatusEffects.unmoving;
-                shootStatusDuration = 60;
-                shoot = new ShootSpread(3, 20){{
-                    firstShotDelay = 90;
-                }};
+                shake = 1;
+                alwaysContinuous = true;
+                continuous = true;
 
-                bullet = new AimBulletType(4, 60){{
-                    sprite = "large-orb";
-                    damage = 60;
-                    maxRange = 270;
-                    homingRange = 270;
-                    homingPower = 0.18f;
-                    homingDelay = 1.5f;
-                    hitSound = despawnSound = Sounds.plasmaboom;
-                    splashDamage = 60;
-                    splashDamageRadius = 16;
-                    speed = 6;
-                    width = 14;
-                    height = 18;
-                    trailWidth = 3;
-                    trailLength = 12;
-                    lifetime = 30f;
-                    shootEffect = new MultiEffect(
-                    new Effect(25f, e -> {
-                        color(Color.white, e.color, e.fin());
-                        stroke(e.fout() * 1.3f + 0.7f);
-
-                        randLenVectors(e.id, 16, 41f * e.fin(), e.rotation, 20f, (x, y) -> {
-                            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 6f + 0.5f);
-                        });
-                    }),
-                    new Effect(25f, 160f, e -> {
-                        color(e.color);
-                        stroke(e.fout() * 5f);
-                        float circleRad = 0f + e.finpow() * 0f;
-                        Lines.circle(e.x, e.y, circleRad);
-
-                        rand.setSeed(e.id);
-                        for(int i = 0; i < 3; i++){
-                            float angle = rand.random(360f);
-                            float lenRand = rand.random(0.5f, 1f);
-                            Tmp.v1.trns(angle, circleRad);
-
-                            for(int s : Mathf.signs){
-                                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 20f, e.fout() * 30f * lenRand + 6f, angle + 90f + s * 90f);
-                            }
-                        }
-                    }),
-                    new Effect(25, e -> {
-                        color(e.color, Color.gray, e.fin());
-                        float w = 2.4f + 9 * e.fout();
-                        Drawf.tri(e.x, e.y, w, 64f * e.fout(), e.rotation);
-                        Drawf.tri(e.x, e.y, w, 6f * e.fout(), e.rotation + 180f);
-                    })
-                    );
-                    smokeEffect = new Effect(25, e -> {
-                        color(Color.white, e.color, e.fin());
-
-                        rand.setSeed(e.id);
-                        for(int i = 0; i < 12; i++){
-                            float rot = e.rotation + rand.range(30f);
-                            v.trns(rot, rand.random(e.finpow() * 42f));
-                            Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 6f + 0.2f, rand.random(360f));
-                        };
-                    });
-                    hitColor = trailColor = backColor = ArikothUnitPal.assaultGold;
-                    frontColor = Color.white;
-                    chargeEffect = new MultiEffect(
-                    new ParticleEffect(){{
-                        sizeFrom = 0;
-                        sizeTo = 3;
-                        lifetime = 35;
-                        baseLength = -40;
-                        length = 40;
-                        interp = Interp.swingIn;
-                        colorTo = ArikothUnitPal.assaultGold;
-                    }},
-                    new ParticleEffect(){{
-                        sizeFrom = 0;
-                        sizeTo = 3;
-                        lifetime = 40;
-                        baseLength = -40;
-                        length = 40;
-                        interp = Interp.swingIn;
-                        colorTo = ArikothUnitPal.assaultGold;
-                    }},
-                    new ParticleEffect(){{
-                        sizeFrom = 0;
-                        sizeTo = 3;
-                        lifetime = 45;
-                        baseLength = -40;
-                        length = 40;
-                        interp = Interp.swingIn;
-                        colorTo = ArikothUnitPal.assaultGold;
-                    }},
-                    new ParticleEffect(){{
-                        sizeFrom = 0;
-                        sizeTo = 3;
-                        lifetime = 50;
-                        baseLength = -40;
-                        length = 40;
-                        interp = Interp.swingIn;
-                        colorTo = ArikothUnitPal.assaultGold;
-                        sizeInterp = Interp.linear;
-                    }},
-                    new ParticleEffect(){{
-                        sizeFrom = 0;
-                        sizeTo = 3;
-                        lifetime = 55;
-                        baseLength = -40;
-                        length = 40;
-                        interp = Interp.swingIn;
-                        colorTo = ArikothUnitPal.assaultGold;
-                        sizeInterp = Interp.linear;
-                    }},
-                    new ParticleEffect(){{
-                        sizeFrom = 0;
-                        sizeTo = 3;
-                        lifetime = 60;
-                        baseLength = -40;
-                        length = 40;
-                        interp = Interp.swingIn;
-                        colorTo = ArikothUnitPal.assaultGold;
-                        sizeInterp = Interp.linear;
-                    }},
-                    new WaveEffect(){{
-                        sizeFrom = 30;
-                        sizeTo = 0;
-                        lifetime = 60;
-                        strokeFrom = 0;
-                        strokeTo = 4;
-                        interp = Interp.linear;
-                        colorTo = ArikothUnitPal.assaultGold;
-                    }}
-                    );
-                    hitEffect = despawnEffect = new MultiEffect(
-                    new Effect(25, e -> {
-                        color(Color.white, e.color, e.fin());
-
-                        rand.setSeed(e.id);
-                        for(int i = 0; i < 8; i++){
-                            float rot = e.rotation + rand.range(360f);
-                            v.trns(rot, rand.random(e.finpow() * 30f));
-                            Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 6f + 0.2f, rand.random(360f));
-                        };
-                    }),
-                    new Effect(25f, 160f, e -> {
-                        color(e.color);
-                        stroke(e.fout() * 5f);
-                        float circleRad = 0f + e.finpow() * 0f;
-                        Lines.circle(e.x, e.y, circleRad);
-
-                        rand.setSeed(e.id);
-                        for(int i = 0; i < 3; i++){
-                            float angle = rand.random(360f);
-                            float lenRand = rand.random(0.5f, 1f);
-                            Tmp.v1.trns(angle, circleRad);
-
-                            for(int s : Mathf.signs){
-                                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 20f, e.fout() * 30f * lenRand + 6f, angle + 90f + s * 90f);
-                            }
-                        }
-                    })
-                    );
+                bullet = new ContinuousFlameBulletType(10){{
+                hitColor = flareColor = ArikothUnitPal.assaultGold;
+                flareRotSpeed = 0;
+                width = 3;
+                length = 40;
+                rangeOverride = 10;
+                colors = new Color[]{ArikothUnitPal.assaultGoldDark.a(0.8f), ArikothUnitPal.assaultGold, Color.white};
                 }};
             }});
         }};
@@ -772,7 +730,7 @@ public class ArikothUnitTypes {
             engines.add(new LightEngine(-48f / 4f, -70f / 4f, 7f, -90, 0.45f, 0.6f, 2.6f));
 
             weapons.add(new Weapon(name + "-howitzer"){{
-                shootSound = Sounds.missileSmall;
+                shootSound = Sounds.plasmadrop;
                 y = -6f;
                 x = 8f;
                 top = true;
@@ -783,49 +741,26 @@ public class ArikothUnitTypes {
                 shake = 6;
 
                 bullet = new BasicBulletType(){{
-                    int count = 1;
-                    for(int j = 0; j < count; j++){
-                        int s = j;
-                        for(int i : Mathf.signs){
-                            float fin = 0.1f + (j + 8) / (float)count;
-                            float spd = speed;
-                            spawnBullets.add(new BasicBulletType(4, 30){{
-                                drag = 0.01f;
-                                width = 14f;
-                                height = 14f;
-                                lifetime = 60;
-                                weaveRandom = false;
-                                hitSize = 5f;
-                                hitColor = backColor = trailColor = ArikothUnitPal.assaultGold;
-                                frontColor = Color.white;
-                                trailWidth = 3f;
-                                trailLength = 18;
-                                weaveScale = (6f + s/4f) / 2f;
-                                weaveMag = i * (8f - fin * 3f);
-
-                                damage = 20;
-                                splashDamage = 25f;
-                                splashDamageRadius = 12f;
-                                despawnEffect = ArikothFx.spikyBoom;
-                            }});
-                        }
-                    }
-                    sprite = "arikoth-rocket";
-                    homingPower = 0.08f;
-                    homingRange = 90;
+                    sprite = "large-bomb";
                     hitSound = despawnSound = Sounds.plasmaboom;
                     splashDamage = 90;
-                    splashDamageRadius = 16;
+                    splashDamageRadius = 32;
 
                     damage = 90;
-                    speed = 3;
-                    width = 14;
+                    speed = 16;
+                    drag = 0.05f;
+                    width = 18;
                     height = 18;
                     trailWidth = 3;
                     trailLength = 18;
-                    lifetime = 60;
+                    lifetime = 30;
+                    shrinkY = shrinkX = -1.5f;
+                    spin = 2;
+                    trailInterp = shrinkInterp = Interp.slope;
                     trailSinScl = 2.5f;
                     trailSinMag = 0.5f;
+                    trailRotation = true;
+                    trailEffect = disperseTrail;
                     shootEffect = new MultiEffect(
                             new ParticleEffect(){{
                                 strokeFrom = 4;
@@ -891,44 +826,7 @@ public class ArikothUnitTypes {
                     });
                     hitColor = trailColor = backColor = ArikothUnitPal.assaultGold;
                     frontColor = Color.white;
-                    hitEffect = despawnEffect = new MultiEffect(
-                            ArikothFx.spikyBoomMedium,
-                            ArikothFx.tinyStarFour,
-                            new Effect(60f, 160f, e -> {
-                                float circleRad = 6f + e.finpow() * 20f;
-
-                                color(e.color, e.foutpow());
-                                Fill.circle(e.x, e.y, circleRad);
-                            }).layer(Layer.bullet + 2f),
-
-                            new Effect(25, e -> {
-                                color(Color.white, e.color, e.fin());
-
-                                rand.setSeed(e.id);
-                                for(int i = 0; i < 8; i++){
-                                    float rot = e.rotation + rand.range(360f);
-                                    v.trns(rot, rand.random(e.finpow() * 30f));
-                                    Fill.poly(e.x + v.x, e.y + v.y, 4, e.fout() * 6f + 0.2f, rand.random(360f));
-                                };
-                            }),
-                            new Effect(25f, 160f, e -> {
-                                color(e.color);
-                                stroke(e.fout() * 5f);
-                                float circleRad = 0f + e.finpow() * 0f;
-                                Lines.circle(e.x, e.y, circleRad);
-
-                                rand.setSeed(e.id);
-                                for(int i = 0; i < 6; i++){
-                                    float angle = rand.random(360f);
-                                    float lenRand = rand.random(0.5f, 1f);
-                                    Tmp.v1.trns(angle, circleRad);
-
-                                    for(int s : Mathf.signs){
-                                        Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 6f, e.fout() * 40f * lenRand + 6f, angle + 90f + s * 90f);
-                                    }
-                                }
-                            })
-                    );
+                    hitEffect = despawnEffect = new MultiEffect(ArikothFx.spikyBoom, ArikothFx.crossExplodeSmall45);
                 }};
             }});
         }};
@@ -938,7 +836,7 @@ public class ArikothUnitTypes {
             constructor = UnitEntity::create;
             lowAltitude = true;
             flying = true;
-            drag = 0.015f;
+            drag = 0.02f;
             speed = 4f;
             rotateSpeed = 3.5f;
             accel = 0.025f;
@@ -948,91 +846,135 @@ public class ArikothUnitTypes {
             fallSpeed = 0.006f;
             outlineColor = ArikothUnitPal.unitOutline;
             range = 120;
-            abilities.add(new MoveEffectAbility(0, -12, ArikothUnitPal.scoutBlue, Fx.missileTrail, 4f));
+            engineSize = 2.5f;
+            engineOffset = 7;
+            engineColor = ArikothUnitPal.scoutBlue;
+            circleTarget = true;
+            parts.addAll(new RegionPart("-rotor"){{
+                  moveRot = 360;
+                  y = -6 / 4f;
+                  under = true;
+                  outline = false;
+                  color = Color.valueOf("ffffff80");
+                  progress = PartProgress.time.loop(30);
+                  layerOffset = -0.001f;
+              }},new RegionPart("-rotor"){{
+                  moveRot = -360;
+                  y = -6 / 4f;
+                  under = true;
+                  outline = false;
+                  color = Color.valueOf("ffffff80");
+                  progress = PartProgress.time.loop(30);
+                  layerOffset = -0.001f;
+              }},new RegionPart("-rotor-shade"){{
+                  moveRot = 360;
+                  y = -6 / 4f;
+                  under = true;
+                  outline = false;
+                  color = Color.valueOf("ffffff80");
+                  progress = PartProgress.time.loop(60);
+                  layerOffset = -0.001f;
+              }},new RegionPart("-rotor-shade"){{
+                  moveRot = -360;
+                  y = -6 / 4f;
+                  under = true;
+                  outline = false;
+                  color = Color.valueOf("ffffff80");
+                  progress = PartProgress.time.loop(60);
+                  layerOffset = -0.001f;
+              }}
+            );
+            abilities.add(new MoveEffectAbility(0, -6 / 4f, Color.darkGray.a(0.5f), new ParticleEffect(){{
+                followParent = true;
+                length = 16;
+                baseLength = 2;
+                layer = Layer.debris;
+                particles = 3;
+                lifetime = 60;
+                interp = Interp.pow3Out;
+                sizeInterp = Interp.slope;
+                sizeFrom = 0;
+                sizeTo = 3;
+                colorFrom = Color.valueOf("787878");
+                colorTo = Color.valueOf("78787888");
+            }}, 4f){{minVelocity = 0;}});
+            abilities.add(new MoveEffectAbility(0, -7, ArikothUnitPal.scoutBlue,
+            new MultiEffect(new ParticleEffect(){{
+                colorFrom = Color.gray;
+                colorTo = Color.darkGray;
+                length  = 6;
+                sizeFrom = 3f;
+                particles = 4;
+                sizeTo = 1;
+                sizeInterp = Interp.linear;
+                interp = Interp.linear;
+                lifetime = 12;
+                cone = 30;
+                rotWithParent = true;
+                layer = 83.9f;
+            }},new ParticleEffect(){{
+                colorFrom = ArikothUnitPal.scoutBlue;
+                colorTo = ArikothUnitPal.scoutBlueDark;
+                length  = 6;
+                sizeFrom = 1.5f;
+                particles = 3;
+                sizeTo = 0;
+                sizeInterp = Interp.linear;
+                interp = Interp.linear;
+                lifetime = 12;
+                cone = 30;
+                rotWithParent = true;
+                layer = 84.9f;
+            }}), 1f){{minVelocity = 1.5f; rotateEffect = true;}});
 
             weapons.add(new Weapon(name+"-laser"){{
-                shootSound = Sounds.blaster;
-                x = 14 / 4;
-                y = 24 / 4;
+                shootSound = Sounds.missile;
+                x = 4;
+                y = 18 / 4;
                 top = true;
                 layerOffset = -0.001f;
                 mirror = true;
+                alternate = false;
                 reload = 20f;
-                shootCone = 20f;
+                shootCone = 90f;
+                baseRotation = -15;
 
-                bullet = new PosLightningType(20){{
-                    maxRange = rangeOverride = 120;
-                    boltNum = 1;
-                    lightningDamage = 5;
-                    lightningColor = ArikothUnitPal.scoutBlue;
-                    lightning = 2;
-                    lightningLengthRand = 3;
-                    lightningLength = 3;
-                    hitEffect = despawnEffect = new Effect(25, e -> {
-                        color(Color.white, e.color, e.fin());
-
-                        rand.setSeed(e.id);
-                        for(int i = 0; i < 6; i++){
-                            float rot = e.rotation + rand.range(360f);
-                            v.trns(rot, rand.random(e.finpow() * 21f));
-                            Fill.poly(e.x + v.x, e.y + v.y, 3, e.fout() * 4f + 0.2f, rand.random(360f));
-                        };
-                    });
-                }};
-            }});
-            weapons.add(new Weapon("placeholder"){{
-                shootSound = Sounds.none;
-                x = 0;
-                y = 0;
-                top = true;
-                layerOffset = 0.05f;
-                mirror = false;
-                alwaysShooting = true;
-                controllable = false;
-                reload = 60f;
-                recoil = 0;
-                shootCone = 20f;
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-messenger-rotor";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-messenger-rotor";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                    rotation = 45;
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-messenger-rotor-shade";
-                    layerOffset = 0.001f;
-                    color = Color.valueOf("#ffffff80");
-                    outline = false;
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = -360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-messenger-rotor-glow";
-                    layerOffset = 0.001f;
-                    outline = false;
-                }});
-                parts.add(new RegionPart(){{
-                    name = "arikoth-messenger-rotor-top";
-                    layerOffset = 0.002f;
-                    outline = false;
-                }});
-
-                bullet = new BasicBulletType(){{
-                    instantDisappear = true;
-                    despawnEffect = hitEffect = shootEffect = smokeEffect = none;
+                bullet = new MissileBulletType(){{
+                    damage = 10;
+                    backColor = trailColor = hitColor = ArikothUnitPal.scoutBlueDark;
+                    frontColor = ArikothUnitPal.scoutBlue;
+                    trailWidth = 2;
+                    trailLength = 6;
+                    speed = 4;
+                    lifetime = 35;
+                    weaveMag = 1;
+                    weaveScale = 2;
+                    width = 12;
+                    height = 12;
+                    homingDelay = 5;
+                    homingPower = 0.08f;
+                    trailInterval = 3;
+                    trailRotation = true;
+                    trailEffect = new MultiEffect(
+                            new ParticleEffect(){{
+                                colorFrom = ArikothUnitPal.scoutBlue;
+                                colorTo = ArikothUnitPal.scoutBlueDark;
+                                sizeFrom = 3;
+                                length = 12;
+                                particles = 3;
+                                cone = 3;
+                                layer = 100;
+                            }},
+                            new ParticleEffect(){{
+                                colorFrom = Color.lightGray;
+                                colorTo = Color.darkGray;
+                                sizeFrom = 4;
+                                length = 16;
+                                particles = 3;
+                                cone = 3;
+                                layer = 99.5f;
+                            }}
+                    );
                 }};
             }});
         }};
@@ -1273,30 +1215,24 @@ public class ArikothUnitTypes {
                 colorTo = Color.valueOf("78787888");
             }}, 4f));
             weapons.add(new Weapon("arikoth-nomad-weapon"){{
-                shootSound = Sounds.shootAlt;
+                shootSound = Sounds.laser;
                 x = 12;
                 y = 8;
-                shoot = new ShootSpread(3, 2){{
-                    shotDelay = 3;
-                }};
-                inaccuracy = 2;
+                shoot = new ShootHelix(6, 2);
                 top = true;
                 layerOffset = -0.001f;
                 mirror = true;
                 reload = 20f;
                 shootCone = 20;
 
-                bullet = new BasicBulletType(6, 20){{
+                bullet = new BasicBulletType(6, 60, "large-orb"){{
                     lifetime = 40;
                     recoil = 0.25f;
                     frontColor = ArikothUnitPal.scoutBlue;
                     backColor = trailColor = hitColor = ArikothUnitPal.scoutBlueDark;
                     trailWidth = 2;
                     trailLength = 18;
-                    maxRange = 270;
-                    homingRange = 270;
-                    homingPower = 0.18f;
-                    width = 8;
+                    width = 16;
                     height = 18;
                     pierceCap = 2;
                     pierceArmor = true;
@@ -1306,10 +1242,10 @@ public class ArikothUnitTypes {
                         stroke(0.2f + e.fout() * 1.7f);
                         rand.setSeed(e.id);
 
-                        for(int i = 0; i < 6; i++){
-                            float rot = e.rotation + rand.range(15f) + 180f;
+                        for(int i = 0; i < 4; i++){
+                            float rot = e.rotation + rand.range(6f) + 180f;
                             v.trns(rot, rand.random(e.fin() * 27f));
-                            lineAngle(e.x + v.x, e.y + v.y, rot, e.fout() * rand.random(4f, 22f) + 1.5f);
+                            lineAngle(e.x + v.x, e.y + v.y, rot, e.fout() * rand.random(4f, 8f) + 1.5f);
                         }
                     });
                     trailRotation = true;
@@ -1318,11 +1254,9 @@ public class ArikothUnitTypes {
                             new Effect(25, e -> {
                                 color(Color.white, ArikothUnitPal.scoutBlue, e.fin());
                                 float w = 2f + 3 * e.fout();
-                                Drawf.tri(e.x, e.y, w, 36f * e.fout(), e.rotation);
-                                Drawf.tri(e.x, e.y, w - 3, 18f * e.fout(), e.rotation + 45f);
-                                Drawf.tri(e.x, e.y, w - 3, 18f * e.fout(), e.rotation + -45f);
-                                Drawf.tri(e.x, e.y, w - 3, 18f * e.fout(), e.rotation + -72f);
-                                Drawf.tri(e.x, e.y, w - 3, 18f * e.fout(), e.rotation + 72f);
+                                Drawf.tri(e.x, e.y, w, 38f * e.fout(), e.rotation);
+                                Drawf.tri(e.x, e.y, w , 20f * e.fout(), e.rotation + 90f * e.fout(Interp.circleOut));
+                                Drawf.tri(e.x, e.y, w, 20f * e.fout(), e.rotation + -90f * e.fout(Interp.circleOut));
                             })
                     );
                     smokeEffect = shootSmokeSquareSparse;
@@ -1450,7 +1384,7 @@ public class ArikothUnitTypes {
             treadPullOffset = 3;
             speed = 3f;
             rotateSpeed = 4.5f;
-            health = 340;
+            health = 240;
             armor = 4f;
             outlineColor = ArikothUnitPal.unitOutline;
             itemCapacity = 0;
@@ -1536,6 +1470,123 @@ public class ArikothUnitTypes {
             }});
         }};
 
+        zephyr = new TankUnitType("zephyr"){{
+            hitSize = 26f;
+            constructor = TankUnit::create;
+            treadPullOffset = 3;
+            speed = 2;
+            rotateSpeed = 2.5f;
+            health = 1220;
+            armor = 6f;
+            outlineColor = ArikothUnitPal.unitOutline;
+            itemCapacity = 0;
+            treadFrames = 8 * 8;
+            treadRects = new Rect[] {
+                    new Rect(24f, -70f, 40, 144)
+            };
+            researchCostMultiplier = 0f;
+
+            weapons.add(new Weapon(name + "-weapon"){{
+                layerOffset = 0.025f;
+                reload = 80f;
+                shootY = 0;
+                recoil = 1.5f;
+                rotate = true;
+                rotateSpeed = 3.2f;
+                mirror = false;
+                shootSound = Sounds.missileSmall;
+                x = 0f;
+                y = -6f;
+                heatColor = ArikothUnitPal.arikothUnitHeat;
+                cooldownTime = 30f;
+                shoot = new ShootBarrel(){{
+                    shots = 7;
+                    shotDelay = 6;
+                    barrels = new float[]{
+                            0, 5, 0,
+                            2, 3, 0,
+                            -2, 3, 0,
+                            4, 5, 0,
+                            -4, 5, 0,
+                            2, 7, 0,
+                            -2, 7, 0
+                    };
+                }};
+                for(int j = 0; j < 3; j++){
+                    int i = j;
+                    parts.add(new RegionPart("-spine"){{
+                        layerOffset = -0.01f;
+                        heatLayerOffset = 0.005f;
+                        x = 2f;
+                        y = -3;
+                        moveX = 3f + i * 1.9f;
+                        moveY = 8f + -4f * i;
+                        moveRot = -90f - i * 25f;
+                        rotation = 0;
+                        mirror = true;
+                        progress = PartProgress.warmup.delay(i * 0.2f).curve(Interp.smoother);
+                        heatProgress = p -> Mathf.absin(Time.time + i * 14f, 7f, 1f);
+
+                        heatColor = ArikothUnitPal.scoutBlue;
+                    }});
+                }
+
+                bullet = new AccelBulletType(8, 40, "arikoth-rocket"){{
+                    frontColor = Color.white;
+                    velocityBegin = 2;
+                    velocityIncrease = 8;
+                    backColor = trailColor = hitColor = ArikothUnitPal.scoutBlue;
+                    trailWidth = 2;
+                    trailLength = 12;
+                    width = 8;
+                    height = 18;
+                    weaveScale = 8;
+                    weaveMag = 2;
+                    trailRotation = true;
+                    trailInterval = 4;
+                    trailEffect = disperseTrail;
+                    pierceBuilding = true;
+                    despawnHit = true;
+                    hitEffect = new MultiEffect(
+                            new Effect(60f, 160f, e -> {
+                                float circleRad = 6f + e.finpow() * 20f;
+
+                                color(e.color, e.foutpow());
+                                Fill.circle(e.x, e.y, circleRad);
+                            }).layer(Layer.bullet + 2f),
+
+                            new Effect(25, e -> {
+                                color(Color.white, e.color, e.fin());
+
+                                rand.setSeed(e.id);
+                                for(int i = 0; i < 8; i++){
+                                    float rot = e.rotation + rand.range(360f);
+                                    v.trns(rot, rand.random(e.finpow() * 30f));
+                                    Fill.poly(e.x + v.x, e.y + v.y, 6, e.fout() * 6f + 0.2f, rand.random(360f));
+                                };
+                            }),
+                            new Effect(25f, 160f, e -> {
+                                color(e.color);
+                                stroke(e.fout() * 5f);
+                                float circleRad = 0f + e.finpow() * 0f;
+                                Lines.circle(e.x, e.y, circleRad);
+
+                                rand.setSeed(e.id);
+                                for(int i = 0; i < 6; i++){
+                                    float angle = rand.random(360f);
+                                    float lenRand = rand.random(0.5f, 1f);
+                                    Tmp.v1.trns(angle, circleRad);
+
+                                    for(int s : Mathf.signs){
+                                        Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 12f, e.fout() * 30f * lenRand + 6f, angle);
+                                    }
+                                }
+                            })
+                    );
+                }};
+            }});
+        }};
+
         react = new UnitType("react"){{
                 constructor = LegsUnit::create;
                 outlineColor = ArikothUnitPal.unitOutline;
@@ -1543,7 +1594,7 @@ public class ArikothUnitTypes {
                 drag = 0.11f;
                 hitSize = 9f;
                 rotateSpeed = 3f;
-                health = 450;
+                health = 350;
                 armor = 4f;
                 legStraightness = 0f;
                 stepShake = 0f;
@@ -1570,23 +1621,37 @@ public class ArikothUnitTypes {
                 targetAir = false;
                 researchCostMultiplier = 0f;
                 weapons.add(new Weapon(name + "-weapon") {{
-                    shootSound = Sounds.sap;
+                    shootSound = Sounds.missile;
                     mirror = true;
                     x = 6f;
                     y = -3f;
                     shootY = 4f;
-                    reload = 10f;
+                    reload = 30f;
                     heatColor = ArikothUnitPal.arikothUnitHeat;
                     inaccuracy = 10;
                     layerOffset = 0.001f;
 
-                    bullet = new SapBulletType() {{
+                    bullet = new MissileBulletType() {{
+                    speed = 6;
+                    lifetime = 20;
                     damage = 10;
-                    sprite = "arikoth-sap-laser";
-                    length = 40;
-                    lengthRand = 10;
-                    hitEffect = hitBulletColor;
-                    despawnEffect = none;
+                    weaveMag = 2;
+                    weaveScale = 4;
+                    trailLength = 12;
+                    trailWidth = 2;
+                    width = 8;
+                    height = 16;
+                    hitColor = trailColor = backColor = ArikothUnitPal.specialistPurpleDark;
+                    frontColor = ArikothUnitPal.specialistPurple;
+                    despawnEffect = hitEffect = new ExplosionEffect(){{
+                        sparks = 6;
+                        sparkRad = 12;
+                        sparkLen = 2;
+                        sparkStroke = 1;
+                        lifetime = 15;
+                        sparkColor = ArikothUnitPal.specialistPurple;
+                        waveRad = smokeSize = 0;
+                    }};
                 }};
             }});
         }};
@@ -1625,27 +1690,25 @@ public class ArikothUnitTypes {
             targetAir = false;
             researchCostMultiplier = 0f;
             weapons.add(new Weapon(name + "-weapon") {{
-                shootSound = Sounds.blaster;
+                shootSound = Sounds.sap;
                 mirror = true;
                 x = 6f;
                 y = -3f;
                 shootY = 4f;
-                reload = 30f;
+                reload = 5f;
                 heatColor = ArikothUnitPal.arikothUnitHeat;
                 layerOffset = 0.001f;
-                shoot = new ShootSpread(3, 8);
 
-                bullet = new BasicBulletType(6, 30, "arikoth-rocket"){{
-                    frontColor = Color.white;
-                    backColor = trailColor = hitColor = ArikothUnitPal.specialistPurple;
-                    weaveMag = 3;
-                    weaveScale = 2;
-                    trailWidth = 2.5f;
-                    trailLength = 12;
-                    width = 12;
-                    height = 16;
-                    homingPower = 0.08f;
-                    homingRange = 40;
+                bullet = new SapBulletType() {{
+                    damage = 10;
+                    color = ArikothUnitPal.specialistPurple;
+                    length = 60;
+                    lengthRand = 15;
+                    hitEffect = hitBulletColor;
+                    despawnEffect = none;
+                    lifetime = 15;
+                    shootEffect = ArikothTurretFx.shootSparkSmall;
+                    smokeEffect = none;
                 }};
             }});
         }};
@@ -1674,16 +1737,6 @@ public class ArikothUnitTypes {
             legForwardScl = 1.2f;
             legGroupSize = 2;
             rippleScale = 0.2f;
-            parts.add(
-            new RegionPart("-weapon-front"){
-                    {
-                    moveRot = -10f;
-                    moveX = -1f;
-                    moveY = 2;
-                    moves.add(new PartMove(PartProgress.reload, 2f, 1f, -25f));
-                    progress = PartProgress.warmup;
-                    mirror = true;
-            }});
 
             legMoveSpace = 1f;
             allowLegStep = true;
@@ -1695,798 +1748,168 @@ public class ArikothUnitTypes {
             researchCostMultiplier = 0f;
             weapons.add(new Weapon(name + "-weapon") {{
                 shootSound = Sounds.shockBlast;
-                mirror = true;
+                parts.add(new RegionPart("-cannon2"){{
+                    moveY = -2f;
+                    progress = PartProgress.recoil;
+                    mirror = false;
+                    under = true;
+                    layerOffset = -0.001f;
+                    recoilIndex = 0;
+                    moves.add(new PartMove(){{progress = PartProgress.warmup; y = 2.5f;}});
+                }});
+                parts.add(new RegionPart("-cannon1"){{
+                    moveY = -2f;
+                    progress = PartProgress.recoil;
+                    mirror = false;
+                    under = true;
+                    layerOffset = -0.001f;
+                    recoilIndex = 1;
+                    moves.add(new PartMove(){{progress = PartProgress.warmup; y = 2.5f;}});
+                }});
+                parts.add(new RegionPart("-front"){{
+                   moveY = -4;
+                   moveX = 4;
+                   progress = PartProgress.warmup;
+                   mirror = true;
+                   under = true;
+                }});
+                mirror = false;
                 x = 0f;
                 y = 0f;
-                shootY = 4;
-                shootX = 8;
+                shootY = 6;
                 alternate = false;
                 reload = 30f;
+                recoil = 0;
+                recoils = 2;
                 heatColor = ArikothUnitPal.arikothUnitHeat;
-                layerOffset = 0.001f;
-                shoot = new ShootHelix(6, 3);
+                shoot = new ShootAlternate(16);
 
-                bullet = new BasicBulletType(6, 50, "large-orb"){{
-                    frontColor = Color.white;
-                    backColor = trailColor = hitColor = ArikothUnitPal.specialistPurple;
-                    trailWidth = 2.5f;
-                    trailLength = 12;
-                    width = 16;
-                    height = 16;
-                    shrinkY = 0;
-                    lifetime = 25;
-                    intervalBullets = 2;
-                    bulletInterval = 8;
-                    despawnEffect = hitEffect = new MultiEffect(
-                            circleColorSpark,
-                            new ParticleEffect(){{
-                                line = true;
-                                particles = 12;
-                                lifetime = 35;
-                                lenFrom = 7;
-                                lenTo = 0;
-                                strokeFrom = 6;
-                                strokeTo = 0;
-                                length = 30;
-                                interp = Interp.circleOut;
-                                colorFrom = Color.white;
-                                colorTo = ArikothUnitPal.specialistPurple;
-                            }},
-                            new WaveEffect(){{
-                                lifetime = 35;
-                                sizeFrom = 30;
-                                sizeTo = 18;
-                                strokeFrom = 4;
-                                strokeTo = 0;
-                                interp = Interp.circleOut;
-                                colorFrom = Color.white;
-                                colorTo = ArikothUnitPal.specialistPurple;
-                            }},
-                            new WaveEffect(){{
-                                lifetime = 35;
-                                sizeFrom = 16;
-                                sizeTo = 0;
-                                strokeFrom = 4;
-                                strokeTo = 0;
-                                interp = Interp.circleOut;
-                                colorFrom = Color.white;
-                                colorTo = ArikothUnitPal.specialistPurple;
-                            }}
-                    );
-                    intervalBullet = new LightningBulletType(){{
-                        damage = 20;
-                        collidesAir = false;
-                        ammoMultiplier = 1f;
-                        lightningColor = ArikothUnitPal.specialistPurpleDark;
-                        lightningLength = 3;
-                        lightningLengthRand = 6;
-
-                        //for visual stats only.
-                        buildingDamageMultiplier = 0.25f;
-
-                        lightningType = new BulletType(0.0001f, 0f){{
-                            lifetime = Fx.lightning.lifetime;
-                            hitEffect = Fx.hitLancer;
-                            despawnEffect = Fx.none;
-                            status = StatusEffects.shocked;
-                            statusDuration = 10f;
-                            hittable = false;
-                            lightColor = Color.white;
-                            buildingDamageMultiplier = 0.25f;
-                        }};
+                bullet = new LaserBulletType(50){{
+                    lightningAngleRand = 0;
+                    lightningDelay = 0;
+                    lightningSpacing = 28;
+                    lightningLength = 2;
+                    lightningLengthRand = 1;
+                    lightningCone = 1;
+                    lightningType = new LaserBulletType(10){{
+                        width = 12;
+                        length = 20;
+                        sideLength = 0;
+                        shootEffect = randLifeSpark;
+                        smokeEffect = shootSmokeDisperse;
+                        colors = new Color[]{ArikothUnitPal.specialistPurpleDark.a(0.8f), ArikothUnitPal.specialistPurple, Color.white};
                     }};
-                }};
-            }});
-        }};
-
-        iracund = new UnitType("iracund"){{
-
-            constructor = UnitEntity::create;
-            lowAltitude = true;
-            flying = true;
-            drag = 0.02f;
-            speed = 0.8f;
-            rotateSpeed = 2.2f;
-            accel = 0.025f;
-            engineSize = 4;
-            engineOffset = 10;
-            trailLength = 24;
-            engineColor = trailColor = ArikothUnitPal.cryo;
-            itemCapacity = 0;
-            health = 2200f;
-            hitSize = 17f;
-            fallSpeed = 0.006f;
-            faceTarget = false;
-            outlineColor = ArikothUnitPal.unitOutline;
-
-            weapons.add(new Weapon(name+"-weapon"){{
-                shootSound = Sounds.bang;
-                x = 0;
-                y = 4;
-                top = true;
-                layerOffset = 0.001f;
-                mirror = false;
-                reload = 90f;
-                shootCone = 20f;
-                recoil = 1.5f;
-                shake = 6;
-                rotate = true;
-                rotateSpeed = 1.5f;
-                shootY = 12;
-                parts.add(new RegionPart("-cannon"){{
-                    moveY = -2.5f;
-                    mirror = false;
-                    under = true;
-                    progress = PartProgress.recoil;
-                }});
-
-                bullet = new BasicBulletType(6, 90){{
-                    lifetime = 30;
-                    recoil = 0.45f;
-                    splashDamage = 90;
-                    splashDamageRadius = 16;
-                    trailRotation = true;
-                    trailInterval = 2;
-                    trailEffect = disperseTrail;
-                    despawnSound = hitSound = Sounds.dullExplosion;
-                    despawnShake = hitShake = 6;
-                    width = 16;
-                    height = 18;
-                    trailWidth = 3f;
-                    trailLength = 18;
-                    pierceCap = 4;
-                    pierceArmor = true;
-                    trailColor = backColor = hitColor = ArikothUnitPal.cryo;
-                    frontColor = Color.white;
-
-                    shootEffect = new MultiEffect(
-                            colorSparkBig,
-                            new Effect(25, e -> {
-                                color(Color.white, ArikothUnitPal.cryo, e.fin());
-                                float w = 2f + 3 * e.fout();
-                                Drawf.tri(e.x, e.y, w + 1, 18f * e.fout(), e.rotation + -45f);
-                                Drawf.tri(e.x, e.y, w + 1, 18f * e.fout(), e.rotation + 45f);
-                            })
-                    );
-                    smokeEffect = shootSmokeSquareSparse;
-                    hitColor = ArikothUnitPal.scoutBlueDark;
-                    hitEffect = randLifeSpark;
-                    despawnEffect = new MultiEffect(
-                    new ParticleEffect(){{
-                        sizeFrom = 8;
-                        sizeTo = 0;
-                        colorFrom = ArikothUnitPal.cryo;
-                        colorTo = ArikothUnitPal.cryoDark.a(0.5f);
-                        length = 25;
-                        particles = 8;
-                        lifetime = 60;
-                        interp = Interp.pow10Out;
-                        sizeInterp = Interp.pow10In;
-                    }},
-                    new ParticleEffect(){{
-                        sizeFrom = 0;
-                        sizeTo = 9;
-                        colorFrom = ArikothUnitPal.cryo;
-                        colorTo = ArikothUnitPal.cryoDark.a(0.5f);
-                        length = 0;
-                        particles = 1;
-                        lifetime  = 40;
-                        sizeInterp = Interp.slope;
-                    }},
-                    new WaveEffect(){{
-                        sizeFrom = 0;
-                        sizeTo = 30;
-                        colorFrom = ArikothUnitPal.cryo;
-                        colorTo = ArikothUnitPal.cryoDark;
-                        sides = 4;
-                        rotation = 45;
-                        strokeFrom = 4;
-                        strokeTo = 0;
-                        lifetime  = 40;
-                        interp = Interp.circleOut;
-                    }}
-                    );
-                }};
-            }});
-            weapons.add(new Weapon("placeholder"){{
-                shootSound = Sounds.none;
-                x = 6;
-                y = 0;
-                top = true;
-                layerOffset = -0.001f;
-                mirror = true;
-                alwaysShooting = true;
-                controllable = false;
-                reload = 30f;
-                recoil = 0;
-                shootCone = 20f;
-                //rotor1
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff30");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor-shade";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = -360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor-shade";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                bullet = new BasicBulletType(){{
-                    instantDisappear = true;
-                    despawnEffect = hitEffect = shootEffect = smokeEffect = none;
-                }};
-            }});
-        }};
-
-        aggravate = new UnitType("aggravate"){{
-
-            constructor = UnitEntity::create;
-            lowAltitude = true;
-            flying = true;
-            drag = 0.02f;
-            speed = 0.7f;
-            rotateSpeed = 2.2f;
-            accel = 0.025f;
-            engineSize = 5;
-            engineOffset = 18;
-            trailLength = 28;
-            engineColor = trailColor = ArikothUnitPal.cryo;
-            itemCapacity = 0;
-            health = 4230f;
-            hitSize = 24f;
-            fallSpeed = 0.006f;
-            faceTarget = false;
-            outlineColor = ArikothUnitPal.unitOutline;
-
-            weapons.add(new Weapon(name+"-weapon"){{
-                shootSound = Sounds.cannon;
-                x = 0;
-                y = 8;
-                top = true;
-                layerOffset = 0.002f;
-                mirror = false;
-                reload = 180f;
-                shootCone = 20f;
-                recoil = 2f;
-                shake = 8;
-                rotate = true;
-                rotateSpeed = 1;
-                shootY = 18;
-                parts.add(new RegionPart("-cannon"){{
-                    moveY = -3.5f;
-                    mirror = false;
-                    under = true;
-                    progress = PartProgress.recoil;
-                }});
-
-                bullet = new BasicBulletType(12, 120){{
-                    lifetime = 20;
-                    recoil = 0.45f;
-                    splashDamage = 120;
-                    splashDamageRadius = 32;
-                    trailRotation = false;
-                    trailInterval = 4;
-                    trailEffect = new Effect(36, e -> {
-                        color(ArikothUnitPal.cryo, ArikothUnitPal.cryoDark, e.fin());
-                        randLenVectors(e.id, 6, 8f + e.fin() * 8f, (x, y) -> {
-                            Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.2f, 45);
-                        });
-                    });
-                    despawnSound = hitSound = Sounds.dullExplosion;
-                    despawnShake = hitShake = 6;
-                    width = 16;
-                    height = 18;
-                    trailWidth = 3f;
-                    trailLength = 18;
-                    trailColor = backColor = hitColor = ArikothUnitPal.cryo;
-                    frontColor = Color.white;
-
-                    shootEffect = new MultiEffect(
-                            colorSparkBig,
-                            new Effect(25, e -> {
-                                color(Color.white, ArikothUnitPal.cryo, e.fin());
-                                float w = 2f + 3 * e.fout();
-                                Drawf.tri(e.x, e.y, w + 1, 18f * e.fout(), e.rotation + -45f);
-                                Drawf.tri(e.x, e.y, w + 1, 18f * e.fout(), e.rotation + 45f);
-                            })
-                    );
-                    smokeEffect = shootSmokeSquareSparse;
-                    hitColor = ArikothUnitPal.scoutBlueDark;
-                    despawnHit = true;
-                    hitEffect = new MultiEffect(
-                        new ParticleEffect(){{
-                            lifetime = 35;
-                            lenFrom = 7;
-                            lenTo = 0;
-                            strokeFrom = 4;
-                            strokeTo = 0;
-                            colorTo = ArikothUnitPal.cryo;
-                            baseRotation = 180;
-                            length = 120;
-                            cone = 40;
-                            interp = Interp.circleOut;
-                        }},
-                        new ParticleEffect(){{
-                          lifetime = 35;
-                          sizeFrom = 4;
-                          sizeTo = 0;
-                          colorTo = ArikothUnitPal.cryo;
-                          baseRotation = 180;
-                          length = 120;
-                          cone = 40;
-                          interp = Interp.circleOut;
-                        }}
-                    );
-                    despawnEffect = new MultiEffect(
-                            new Effect(36, e -> {
-                                color(ArikothUnitPal.cryo, ArikothUnitPal.cryoDark, e.fin());
-                                randLenVectors(e.id, 18, 25f + e.fin() * 8f, (x, y) -> {
-                                    Fill.square(e.x + x, e.y + y, e.fout() * 6f + 0.2f, 45);
-                                });
-                            }),
-                            new ParticleEffect(){{
-                                sizeFrom = 8;
-                                sizeTo = 0;
-                                colorFrom = ArikothUnitPal.cryo;
-                                colorTo = ArikothUnitPal.cryoDark.a(0.5f);
-                                length = 25;
-                                particles = 8;
-                                lifetime = 60;
-                                interp = Interp.pow10Out;
-                                sizeInterp = Interp.pow10In;
-                            }},
-                            new ParticleEffect(){{
-                                sizeFrom = 0;
-                                sizeTo = 9;
-                                colorFrom = ArikothUnitPal.cryo;
-                                colorTo = ArikothUnitPal.cryoDark.a(0.5f);
-                                length = 0;
-                                particles = 1;
-                                lifetime  = 40;
-                                sizeInterp = Interp.slope;
-                            }},
-                            new WaveEffect(){{
-                                sizeFrom = 0;
-                                sizeTo = 30;
-                                colorFrom = ArikothUnitPal.cryo;
-                                colorTo = ArikothUnitPal.cryoDark;
-                                sides = 4;
-                                rotation = 45;
-                                strokeFrom = 4;
-                                strokeTo = 0;
-                                lifetime  = 40;
-                                interp = Interp.circleOut;
-                            }},
-                            new WaveEffect(){{
-                                sizeFrom = 0;
-                                sizeTo = 60;
-                                colorFrom = ArikothUnitPal.cryo;
-                                colorTo = ArikothUnitPal.cryoDark;
-                                sides = 4;
-                                rotation = 45;
-                                strokeFrom = 4;
-                                strokeTo = 0;
-                                lifetime  = 40;
-                                interp = Interp.circleOut;
-                            }}
-                    );
-                }};
-            }});
-            weapons.add(new Weapon(name+"-launcher"){{
-                shootSound = Sounds.missileSmall;
-                x = -32 / 4f;
-                y = -48 / 4f;
-                top = true;
-                layerOffset = 0.001f;
-                mirror = true;
-                alternate = false;
-                reload = 50f;
-                shootCone = 20;
-                recoil = 0.5f;
-                shake = 8;
-                shootY = 8;
-                rotateSpeed = 2.5f;
-                rotate = true;
-
-                bullet = new BasicBulletType(0, 0){{
-                    instantDisappear = true;
-                    spawnUnit = new MissileUnitType("cryo-rocket"){{
-                        trailColor = engineColor = ArikothUnitPal.cryo;
-                        engineSize = 1.75f;
-                        engineLayer = Layer.effect;
-                        speed = 3f;
-                        maxRange = 6f;
-                        lifetime = 60f;
-                        outlineColor = Pal.darkOutline;
-                        health = 90;
-                        lowAltitude = true;
-                        despawnSound = Sounds.dullExplosion;
-
-                        parts.add(new FlarePart(){{
-                            progress = PartProgress.life.slope().curve(Interp.pow5Out);
-                            radius = 0f;
-                            radiusTo = 25f;
-                            stroke = 3f;
-                            rotation = 45f;
-                            color1 = ArikothUnitPal.cryo;
-                            y = -5f;
-                            followRotation = true;
-                        }});
-
-                        weapons.add(new Weapon(){{
-                            shootSound = Sounds.none;
-                            shootCone = 360f;
-                            mirror = false;
-                            reload = 1f;
-                            shootOnDeath = true;
-                            bullet = new ExplosionBulletType(20f, 25f){{
-                                shootEffect = new MultiEffect(
-                                new WrapEffect(ArikothFx.dynamicSpikesModif1, ArikothUnitPal.cryo, 24f),
-                                new WaveEffect(){{
-                                    colorFrom = colorTo = ArikothUnitPal.cryo;
-                                    sizeTo = 40f;
-                                    lifetime = 12f;
-                                    strokeFrom = 4f;
-                                }},
-                                new Effect(36, e -> {
-                                    color(ArikothUnitPal.cryo, ArikothUnitPal.cryoDark, e.fin());
-                                    randLenVectors(e.id, 8, 18f + e.fin() * 8f, (x, y) -> {
-                                        Fill.square(e.x + x, e.y + y, e.fout() * 6f + 0.2f, 45);
-                                    });
-                                })
-                                );
-                            }};
-                        }});
-                    }};
-                    despawnSound = hitSound = Sounds.none;
-
-                    shootEffect = Fx.none;
-                    smokeEffect = shootSmokeTitan;
-                    hitColor = ArikothUnitPal.scoutBlueDark;
-                    hitEffect = despawnEffect = Fx.none;
-                }};
-            }});
-            weapons.add(new Weapon("placeholder"){{
-                shootSound = Sounds.none;
-                x = 42 / 4f;
-                y = 0;
-                top = true;
-                layerOffset = -0.001f;
-                mirror = true;
-                alwaysShooting = true;
-                controllable = false;
-                reload = 30f;
-                recoil = 0;
-                shootCone = 20f;
-                //rotor1
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff30");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor-shade";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = -360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor-shade";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                bullet = new BasicBulletType(){{
-                    instantDisappear = true;
-                    despawnEffect = hitEffect = shootEffect = smokeEffect = none;
-                }};
-            }});
-        }};
-
-        cantankerous = new UnitType("cantankerous"){{
-
-            constructor = UnitEntity::create;
-            lowAltitude = true;
-            outlineRadius = 4;
-            flying = true;
-            drag = 0.02f;
-            speed = 0.5f;
-            rotateSpeed = 1.2f;
-            accel = 0.025f;
-            engineSize = 5;
-            engineOffset = 24;
-            trailLength = 38;
-            engineColor = trailColor = ArikothUnitPal.cryo;
-            itemCapacity = 0;
-            health = 12300f;
-            hitSize = 32f;
-            fallSpeed = 0.006f;
-            faceTarget = false;
-            outlineColor = ArikothUnitPal.unitOutline;
-
-            weapons.add(new Weapon(name+"-turret"){{
-                shootSound = Sounds.mediumCannon;
-                x = 0;
-                y = -68 / 4f;
-                top = true;
-                layerOffset = 0.003f;
-                mirror = false;
-                reload = 190f;
-                shootCone = 20f;
-                recoil = 3f;
-                shake = 8;
-                rotate = true;
-                rotateSpeed = 1;
-                shootY = 18;
-                parts.add(new RegionPart("-front"){{
-                    moveY = -3.5f;
-                    mirror = false;
-                    under = true;
-                    progress = PartProgress.recoil;
-                }});
-
-                bullet = new ArtilleryBulletType(2, 370){{
-                    lifetime = 140;
-                    buildingDamageMultiplier = 0.75f;
-                    splashDamage = 370;
-                    splashDamageRadius = 64;
-                    trailRotation = false;
-                    trailInterval = 4;
-                    trailEffect = new Effect(36, e -> {
-                        color(ArikothUnitPal.cryo, ArikothUnitPal.cryoDark, e.fin());
-                        randLenVectors(e.id, 6, 8f + e.fin() * 8f, (x, y) -> {
-                            Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.2f, 45);
-                        });
-                    });
-                    despawnSound = hitSound = Sounds.titanExplosion;
-                    despawnShake = hitShake = 6;
                     width = 18;
-                    height = 24;
-                    trailWidth = 3.5f;
-                    trailLength = 18;
-                    trailColor = backColor = hitColor = ArikothUnitPal.cryo;
-                    frontColor = Color.white;
-
-                    shootEffect = new MultiEffect(
-                            colorSparkBig,
-                            new Effect(25, e -> {
-                                color(Color.white, ArikothUnitPal.cryo, e.fin());
-                                float w = 2f + 3 * e.fout();
-                                Drawf.tri(e.x, e.y, w + 1, 18f * e.fout(), e.rotation + -45f);
-                                Drawf.tri(e.x, e.y, w + 1, 18f * e.fout(), e.rotation + 45f);
-                            })
-                    );
-                    smokeEffect = shootSmokeTitan;
-                    hitColor = ArikothUnitPal.scoutBlueDark;
-                    despawnHit = true;
-                    despawnEffect = new MultiEffect(
-                            new Effect(36, e -> {
-                                color(ArikothUnitPal.cryo, ArikothUnitPal.cryoDark, e.fin());
-                                randLenVectors(e.id, 18, 25f + e.fin() * 8f, (x, y) -> {
-                                    Fill.square(e.x + x, e.y + y, e.fout() * 6f + 0.2f, 45);
-                                });
-                            }),
-                            titanSmokeSmall,
-                            titanExplosionSmall,
-                            new ParticleEffect(){{
-                                sizeFrom = 8;
-                                sizeTo = 0;
-                                colorFrom = ArikothUnitPal.cryo;
-                                colorTo = ArikothUnitPal.cryoDark.a(0.5f);
-                                length = 25;
-                                particles = 8;
-                                lifetime = 60;
-                                interp = Interp.pow10Out;
-                                sizeInterp = Interp.pow10In;
-                            }},
-                            new ParticleEffect(){{
-                                sizeFrom = 0;
-                                sizeTo = 9;
-                                colorFrom = ArikothUnitPal.cryo;
-                                colorTo = ArikothUnitPal.cryoDark.a(0.5f);
-                                length = 0;
-                                particles = 1;
-                                lifetime  = 40;
-                                sizeInterp = Interp.slope;
-                            }},
-                            new WaveEffect(){{
-                                sizeFrom = 0;
-                                sizeTo = 30;
-                                colorFrom = ArikothUnitPal.cryo;
-                                colorTo = ArikothUnitPal.cryoDark;
-                                sides = 4;
-                                rotation = 45;
-                                strokeFrom = 4;
-                                strokeTo = 0;
-                                lifetime  = 40;
-                                interp = Interp.circleOut;
-                            }},
-                            new WaveEffect(){{
-                                sizeFrom = 0;
-                                sizeTo = 60;
-                                colorFrom = ArikothUnitPal.cryo;
-                                colorTo = ArikothUnitPal.cryoDark;
-                                sides = 4;
-                                rotation = 45;
-                                strokeFrom = 4;
-                                strokeTo = 0;
-                                lifetime  = 40;
-                                interp = Interp.circleOut;
-                            }}
-                    );
+                    length = 160;
+                    sideLength = 0;
+                    shootEffect = randLifeSpark;
+                    smokeEffect = shootSmokeDisperse;
+                    colors = new Color[]{ArikothUnitPal.specialistPurpleDark.a(0.8f), ArikothUnitPal.specialistPurple, Color.white};
                 }};
             }});
-            weapons.add(new Weapon(name+"-gunner1"){{
-                shootSound = Sounds.shootAlt;
-                x = -38 / 4f;
-                y = -48 / 4f;
-                top = true;
-                layerOffset = 0.001f;
+        }};
+
+        dominion = new UnitType("dominion"){{
+            constructor = LegsUnit::create;
+            outlineColor = ArikothUnitPal.unitOutline;
+            outlineRadius = 4;
+            speed = 0.38f;
+            drag = 0.11f;
+            hitSize = 26f;
+            rotateSpeed = 2f;
+            health = 12320;
+            armor = 8f;
+
+            legCount = 4;
+            legMoveSpace = 1f;
+            legPairOffset = 3;
+            legLength = 45f;
+            legExtension = -6;
+            legBaseOffset = 10f;
+            stepShake = 1f;
+            legLengthScl = 0.96f;
+            rippleScale = 2f;
+            legSpeed = 0.2f;
+
+            allowLegStep = true;
+            hovering = true;
+            legPhysicsLayer = false;
+            shadowElevation = 0.1f;
+            groundLayer = Layer.legUnit - 1f;
+            targetAir = false;
+            researchCostMultiplier = 0f;
+            weapons.add(new Weapon() {{
+                shootSound = Sounds.missile;
                 mirror = true;
+                x = 16f;
+                y = -3f;
+                shootY = 6;
+                alternate = false;
+                reload = 120f;
+                recoil = 0;
+                recoils = 2;
+                heatColor = ArikothUnitPal.arikothUnitHeat;
+                shoot.shots = 12;
+                shoot.shotDelay = 2;
+                inaccuracy = 3;
+                baseRotation = -90;
+                shootCone = 360;
+
+                bullet = new AimBulletType(6, 10){{
+                    speed = 6;
+                    width = 8;
+                    height = 12;
+                    weaveMag = 2;
+                    trailColor = backColor = hitColor = ArikothUnitPal.specialistPurple;
+                    frontColor = Color.white;
+                    trailWidth = 2;
+                    trailLength = 12;
+                    homingDelay = 5;
+                    homingPower = 0.28f;
+                    lifetime = 80;
+                    shootEffect = sparkShoot;
+                    smokeEffect = shootSmokeDisperse;
+                    hitEffect = despawnEffect = ArikothTurretFx.hitLargeBulletColor;
+                }};
+            }});
+            weapons.add(new Weapon(name + "-weapon") {{
+                shootSound = Sounds.malignShoot;
+                mirror = true;
+                x = 10f;
+                y = -6f;
+                shootY = 6;
                 alternate = true;
-                reload = 60f;
-                shootCone = 20;
-                recoil = 0.5f;
-                shake = 0;
-                shootY = 8;
-                rotateSpeed = 2.5f;
-                shoot.shots = 4;
-                shoot.shotDelay = 3;
-                rotate = true;
-
-                bullet = new BasicBulletType(6, 30){{
-                    despawnSound = hitSound = Sounds.none;
-
-                    shootEffect = colorSparkBig;
-                    smokeEffect = Fx.none;
-                    height = 16; width = 12; trailWidth = 2.5f; trailLength = 12;
-                    hitEffect = despawnEffect = new Effect(25, e -> {
-                        color(ArikothUnitPal.cryo, ArikothUnitPal.cryoDark, e.fin());
-                        randLenVectors(e.id, 4, 8f + e.fin() * 2f, (x, y) -> {
-                            Fill.square(e.x + x, e.y + y, e.fout() * 1f + 0.2f, 45);
-                        });
-                    });
-                    trailColor = backColor = hitColor = ArikothUnitPal.cryo;
-                    frontColor = Color.white;
-                    lifetime = 40;
-                }};
-            }});
-            weapons.add(new Weapon(name+"-gunner2"){{
-                shootSound = Sounds.blaster;
-                x = 42 / 4f;
-                y = 0;
-                top = true;
-                layerOffset = 0.001f;
-                mirror = true;
-                alternate = true;
-                reload = 10f;
-                shootCone = 20;
-                recoil = 0.5f;
-                shake = 0;
-                shootY = 8;
-                rotateSpeed = 2.5f;
-                rotate = true;
-
-                bullet = new BasicBulletType(6, 20){{
-                    despawnSound = hitSound = Sounds.none;
-
-                    shootEffect = colorSparkBig;
-                    smokeEffect = Fx.none;
-                    height = 16; width = 12; trailWidth = 2.5f; trailLength = 12;
-                    hitEffect = despawnEffect = new Effect(25, e -> {
-                        color(ArikothUnitPal.cryo, ArikothUnitPal.cryoDark, e.fin());
-                        randLenVectors(e.id, 4, 8f + e.fin() * 2f, (x, y) -> {
-                            Fill.square(e.x + x, e.y + y, e.fout() * 1f + 0.2f, 45);
-                        });
-                    });
-                    trailColor = backColor = hitColor = ArikothUnitPal.cryo;
-                    frontColor = Color.white;
-                    lifetime = 40;
-                }};
-            }});
-            weapons.add(new Weapon("placeholder"){{
-                shootSound = Sounds.none;
-                x = 45 / 4f;
-                y = 0;
-                top = true;
-                layerOffset = -0.001f;
-                mirror = true;
-                alwaysShooting = true;
-                controllable = false;
                 reload = 30f;
                 recoil = 0;
-                shootCone = 20f;
-                //rotor1
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff30");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor-shade";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = -360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor-shade";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                bullet = new BasicBulletType(){{
-                    instantDisappear = true;
-                    despawnEffect = hitEffect = shootEffect = smokeEffect = none;
-                }};
-            }});
-            weapons.add(new Weapon("placeholder"){{
-                shootSound = Sounds.none;
-                x = 44 / 4f;
-                y = -62 / 4;
-                top = true;
-                layerOffset = -0.001f;
-                mirror = true;
-                alwaysShooting = true;
-                controllable = false;
-                reload = 30f;
-                recoil = 0;
-                shootCone = 20f;
-                //rotor1
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff30");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = 360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor-shade";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                parts.add(new RegionPart(){{
-                    moveRot = -360;
-                    progress = PartProgress.recoil;
-                    name = "arikoth-iracund-rotor-shade";
-                    layerOffset = 0;
-                    outline = false;
-                    color = Color.valueOf("#ffffff60");
-                }});
-                bullet = new BasicBulletType(){{
-                    instantDisappear = true;
-                    despawnEffect = hitEffect = shootEffect = smokeEffect = none;
+                recoils = 2;
+                heatColor = ArikothUnitPal.arikothUnitHeat;
+                shoot.shots = 2;
+                shoot.shotDelay = 8;
+                inaccuracy = 3;
+                layerOffset = 0.001f;
+
+                bullet = new LaserBulletType(40){{
+                    lightningAngleRand = 0;
+                    lightningAngle = 45;
+                    lightningDelay = 0;
+                    lightningSpacing = 32;
+                    lightningLength = 2;
+                    lightningLengthRand = 1;
+                    lightningCone = 1;
+                    lightningType = new LaserBulletType(10){{
+                        width = 12;
+                        length = 16;
+                        sideLength = 0;
+                        shootEffect = randLifeSpark;
+                        smokeEffect = shootSmokeDisperse;
+                        colors = new Color[]{ArikothUnitPal.specialistPurpleDark.a(0.8f), ArikothUnitPal.specialistPurple, Color.white};
+                    }};
+                    width = 18;
+                    length = 190;
+                    sideLength = 0;
+                    shootEffect = randLifeSpark;
+                    smokeEffect = shootSmokeDisperse;
+                    colors = new Color[]{ArikothUnitPal.specialistPurpleDark.a(0.8f), ArikothUnitPal.specialistPurple, Color.white};
                 }};
             }});
         }};
@@ -2579,7 +2002,7 @@ public class ArikothUnitTypes {
                                        colorTo = ArikothTurretPal.strontiumTrail.a(60);
                                    }}
                            );
-                           applySound = explosionbig;
+                           applySound = Sounds.explosionbig;
                            frontColor = Color.white;
                            backColor = hitColor = ArikothTurretPal.strontiumLight;
                            particleColor = backColor;
@@ -2858,17 +2281,19 @@ public class ArikothUnitTypes {
             }});
         }};
 
-        vision = new UnitType("vision") {{
+        pioneer = new UnitType("pioneer") {{
             aiController = BuilderAI::new;
             constructor = UnitEntity::create;
 
             lowAltitude = true;
-            speed = 3;
-            rotateSpeed = 15;
+            speed = 5f;
+            fallSpeed = 0.05f;
+            boostMultiplier = 2f;
+            rotateSpeed = 6.8f;
+            drag = 0.08f;
             accel = 0.1f;
-            drag = 0.04f;
             flying = true;
-            health = 320;
+            health = 380;
             hitSize = 8;
             armor = 3;
             itemCapacity = 40;
@@ -2876,35 +2301,103 @@ public class ArikothUnitTypes {
             engineOffset = 7.5f;
             faceTarget = true;
             mineTier = 1;
-            mineSpeed = 5;
+            mineSpeed = 2;
             buildSpeed = 1f;
             buildBeamOffset = 5;
             isEnemy = false;
             mineWalls = true;
             mineFloor = false;
-
+            targetable = true;
+            hittable = true;
             weapons.add(new RepairBeamWeapon(){{
-                widthSinMag = 0.11f;
-                reload = 20f;
-                x = 0f;
-                y = 6.5f;
-                rotate = false;
-                shootY = 0f;
+                y =6f;
+                x = 0;
+                mirror = false;
+                layerOffset = -0.001f;
                 beamWidth = 0.7f;
                 repairSpeed = 3.1f;
                 fractionRepairSpeed = 0.06f;
                 aimDst = 0f;
                 shootCone = 15f;
-                mirror = false;
 
                 targetUnits = false;
                 targetBuildings = true;
                 autoTarget = false;
                 controllable = true;
-                healColor = laserColor = Color.valueOf("#8875ff");
+                laserColor = Pal.accent;
+                healColor = Pal.accent;
 
-                bullet = new BulletType() {{
+                bullet = new BulletType(){{
                     maxRange = 60f;
+                }};
+            }});
+        }};
+
+        vision = new UnitType("vision") {{
+            aiController = BuilderAI::new;
+            constructor = UnitEntity::create;
+
+            lowAltitude = true;
+            speed = 3.8f;
+            fallSpeed = 0.05f;
+            boostMultiplier = 2f;
+            rotateSpeed = 4.8f;
+            drag = 0.08f;
+            accel = 0.1f;
+            flying = true;
+            health = 380;
+            hitSize = 8;
+            armor = 3;
+            itemCapacity = 40;
+            outlineColor = ArikothUnitPal.unitOutline;
+            engineOffset = 8.5f;
+            engineSize = 3.2f;
+            faceTarget = true;
+            mineTier = 1;
+            mineSpeed = 5;
+            buildSpeed = 2f;
+            buildBeamOffset = 5;
+            isEnemy = false;
+            mineWalls = true;
+            mineFloor = false;
+            targetable = true;
+            hittable = true;
+            setEnginesMirror(
+                    new UnitEngine(7.5f, -7.5f, 2.4f, -45f)
+            );
+            weapons.add(new Weapon(){{
+                y = 4f;
+                x = 0f;
+                rotate = false;
+                shootY = 7f;
+                mirror = false;
+                layerOffset = -0.001f;
+                reload = 30;
+                shootSound = Sounds.bolt;
+                soundPitchMin = 2.8f;
+                soundPitchMax = 1.2f;
+                shootCone = 15f;
+                shoot.shots = 5;
+                shoot.shotDelay = 3;
+                inaccuracy = 6;
+                velocityRnd = 0.2f;
+
+                bullet = new LaserBoltBulletType(8, 10){{
+                    width = 1.5f;
+                    height = 7f;
+                    lifetime = 20f;
+                    smokeEffect = none;
+                    shootEffect = ArikothTurretFx.hitLaserAccent;
+
+                    hitEffect = despawnEffect = ArikothTurretFx.verySmallStarFour;
+
+                    collidesTeam = true;
+                    healAmount = 30;
+
+                    buildingDamageMultiplier = 0.05f;
+
+                    backColor = hitColor =  Pal.accent;
+                    frontColor = Color.white;
                 }};
             }});
         }};

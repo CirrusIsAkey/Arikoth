@@ -7,10 +7,8 @@ import arc.math.geom.Position;
 import arc.math.geom.Vec2;
 import arc.struct.IntSeq;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Tmp;
-import arikoth.Arikoth;
-import arikoth.content.ArikothFxf;
+import arikoth.content.effects.ArikothFxf;
 import arikoth.world.entities.ModDamage;
 import mindustry.Vars;
 import mindustry.content.Fx;
@@ -20,7 +18,6 @@ import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.world.Tile;
 
-import static arikoth.world.entities.ModDamage.list;
 import static arikoth.world.entities.ModDamage.list;
 
 //author @Sh1penfire

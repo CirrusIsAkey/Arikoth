@@ -1,4 +1,4 @@
-package main.graphics;
+package arikoth.graphics;
 
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;

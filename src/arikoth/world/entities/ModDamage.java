@@ -10,7 +10,7 @@ import arc.struct.IntSeq;
 import arc.struct.Seq;
 import arc.util.Nullable;
 import arc.util.Time;
-import arikoth.content.ArikothFxf;
+import arikoth.content.effects.ArikothFxf;
 import mindustry.entities.Effect;
 import mindustry.game.Team;
 import mindustry.gen.Groups;

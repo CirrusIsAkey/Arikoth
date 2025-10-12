@@ -4,18 +4,22 @@ import arc.graphics.Color;
 import mindustry.game.Team;
 
 public class ArikothTeams {
-    public static Team conquisitoris;
+    public static Team conquisitoris, luxis;
 
     public static void load(){
-        conquisitoris = editTeam(Team.blue, "\uECC3", "conquisitoris", Color.valueOf("a8b2ff"),
+        luxis = editTeam(Team.green, "Luxis", Color.valueOf("8875ff"),
+                Color.valueOf("8875ff"),
+                Color.valueOf("594dd0"),
+                Color.valueOf("362c9c")
+        );
+        conquisitoris = editTeam(Team.blue, "Conquistoris", Color.valueOf("a8b2ff"),
                 Color.valueOf("a8b2ff"),
                 Color.valueOf("887dff"),
                 Color.valueOf("5a4fd1")
         );
     }
 
-    public static Team editTeam(Team team, String icon, String name, Color color, Color pal1, Color pal2, Color pal3){
-        team.emoji = icon;
+    public static Team editTeam(Team team, String name, Color color, Color pal1, Color pal2, Color pal3){
         team.name = name;
         team.color.set(color);
         team.palette[0] = pal1;

@@ -5,7 +5,13 @@ displayName: "Arikoth"
 name: "arikoth"
 
 #your name
-author: "Hyperium"
+author: '''
+[accent]Hyperium[]
+
+contributors:
+[#fba45a]Sh1penfire[]
+Lao_Hua-Ji
+'''
 
 #the fully qualified main class of the mod
 main: "arikoth.Arikoth"

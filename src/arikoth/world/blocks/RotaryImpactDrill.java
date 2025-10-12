@@ -1,4 +1,3 @@
-
 package arikoth.world.blocks;
 
 import arc.Core;
@@ -62,9 +61,9 @@ public class RotaryImpactDrill extends BurstDrill {
                 //TODO maybe just use arrow alpha and draw gray on the base?
                 Draw.z(Layer.blockAdditive);
                 Draw.blend(Blending.additive);
-                Draw.color(baseArrowColor, arrowColor, a);
+                Draw.color(baseArrowColor, dominantItem.color, a);
                 Draw.rect(arrowRegions[j], x, y);
-                Draw.color(arrowColor);
+                Draw.color(dominantItem.color);
                 Draw.blend();
 
                 if(arrowBlurRegion.found()){

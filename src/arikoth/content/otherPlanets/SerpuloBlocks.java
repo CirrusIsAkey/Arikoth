@@ -5,11 +5,9 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.scene.actions.Actions;
-import arikoth.content.ArikothFx;
+import arikoth.content.effects.ArikothFx;
 import arikoth.content.ArikothItems;
 import arikoth.content.ArikothSounds;
-import arikoth.graphics.ArikothShaders;
 import arikoth.palettes.VanillaPal;
 import arikoth.world.blocks.env.AFloor;
 import arikoth.world.blocks.env.EffectFloor;
@@ -1140,88 +1138,6 @@ public class SerpuloBlocks {
                             lightningColor = hitColor;
                             lightningLength = 3;
                             lightningLengthRand = 2;
-                        }};
-                    }},
-                    ArikothItems.kaneturium, new ArtilleryBulletType(2f, 10, "shell"){{
-                        width = 18f;
-                        height = 24f;
-                        shrinkY = 0.2f;
-                        ammoMultiplier = 2f;
-                        lifetime = 300;
-                        despawnHit = true;
-                        despawnSound = Sounds.explosionbig;
-                        hitShake = 10;
-                        hitSound = Sounds.none;
-                        trailWidth = 3f;
-                        splashDamage = 280;
-                        splashDamageRadius = 96;
-                        trailLength = 28;
-                        lifeScaleRandMin = 0.9f;
-                        parts.add(new FlarePart(){{
-                            stroke = 5f;
-                            radius = 0;
-                            radiusTo = 28;
-                            color1 = VanillaPal.kaneturiumAmmoLight;
-                            y = -4;
-                            rotMove = 360;
-                            progress = PartProgress.life.slope().curve(Interp.pow2Out);
-                        }});
-
-                        hitColor = backColor = trailColor = VanillaPal.kaneturiumAmmoDark;
-                        frontColor = VanillaPal.kaneturiumAmmoLight;
-                        trailEffect = new Effect(40f, 160f, e -> {
-                            Draw.color(e.color);
-                            for(int s : Mathf.signs){
-                                Drawf.tri(e.x, e.y, e.fout() * 6f, e.foutpow() * 18f + 6f, e.rotation + s * 90f);
-                            }
-                        });
-                        trailInterval = 24;
-                        trailRotation = true;
-                        hitEffect = despawnEffect;
-                        despawnEffect = new MultiEffect(
-                                ArikothFx.spikyBoomMedium,
-                                ArikothFx.mediumStarFour,
-                                new Effect(90f, 160f, e -> {
-                                    float circleRad = 6f + e.finpow() * 20f;
-
-                                    color(VanillaPal.kaneturiumAmmoLight, e.foutpow());
-                                    Fill.circle(e.x, e.y, circleRad);
-                                }).layer(Layer.bullet + 2f)
-                        );
-                        fragBullets = 16;
-                        fragRandomSpread = 0;
-                        fragSpread = 22.5f;
-                        fragVelocityMax = 1.1f;
-                        fragVelocityMin = 0.9f;
-                        fragLifeMax = 1.9f;
-                        fragLifeMin = 0.8f;
-                        fragBullet = new ArtilleryBulletType(){{
-                            hitColor = backColor = trailColor = VanillaPal.kaneturiumAmmoDark;
-                            frontColor = VanillaPal.kaneturiumAmmoLight;
-                            width = height = 12;
-                            trailEffect = Fx.artilleryTrail;
-                            speed = 2;
-                            lifetime = 10;
-                            shrinkY = 0.2f;
-                            splashDamage = 90;
-                            splashDamageRadius = 16;
-                            fragBullets = 1;
-                            fragRandomSpread = 0;
-                            fragVelocityMax = 1f;
-                            fragVelocityMin = 0.8f;
-                            fragLifeMax = 1.1f;
-                            fragLifeMin = 0.8f;
-                            fragBullet = new ArtilleryBulletType(){{
-                                hitColor = backColor = trailColor = VanillaPal.kaneturiumAmmoDark;
-                                frontColor = VanillaPal.kaneturiumAmmoLight;
-                                width = height = 12;
-                                trailEffect = Fx.artilleryTrail;
-                                speed = 2;
-                                lifetime = 10;
-                                shrinkY = 0.2f;
-                                splashDamage = 80;
-                                splashDamageRadius = 32;
-                            }};
                         }};
                     }}
             );

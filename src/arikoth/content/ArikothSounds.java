@@ -15,6 +15,7 @@ public class ArikothSounds {
             rotorWhir = new Sound(),
             smallShot = new Sound(),
             steamHiss = new Sound(),
+            plasmaBoomAlt = new Sound(),
             sniperShot = new Sound();
 
 
@@ -25,6 +26,7 @@ public class ArikothSounds {
         rotorWhir = loadSound("rotorWhir");
         smallShot = loadSound("smallShot");
         steamHiss = loadSound("steamHiss");
+        plasmaBoomAlt = loadSound("plasmaBoomAlt");
         sniperShot = loadSound("sniperShot");
     }
 

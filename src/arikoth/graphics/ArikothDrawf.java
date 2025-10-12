@@ -12,7 +12,6 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import arc.util.pooling.*;
-import arikoth.palettes.ArikothUnitPal;
 import mindustry.*;
 import mindustry.gen.Building;
 import mindustry.graphics.*;
@@ -22,10 +21,7 @@ import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Mathf.*;
-import static arikoth.content.ArikothFx.rand;
 import static mindustry.Vars.*;
-import static arikoth.graphics.ArikothShaderf.*;
-import static mindustry.content.Fx.v;
 
 public class ArikothDrawf{
     private static final Vec2 vec1 = new Vec2(), vec2 = new Vec2(), vec3 = new Vec2(), vec4 = new Vec2();
@@ -179,10 +175,6 @@ public class ArikothDrawf{
         Lines.stroke(1f);
     }
 
-    public static void blockBuild(float x, float y, TextureRegion region, float rotation, float progress){
-        blockBuild(x, y, region, Pal.accent, rotation, progress);
-    }
-
     public static void blockBuild(float x, float y, TextureRegion region, Color color, float rotation, float progress){
         Shaders.blockbuild.region = region;
         Shaders.blockbuild.progress = progress;
@@ -192,123 +184,6 @@ public class ArikothDrawf{
         Draw.rect(region, x, y, rotation);
         Draw.shader();
         Draw.color();
-    }
-
-    public static void blockBuildCenter(float x, float y, TextureRegion region, float rotation, float progress){
-        blockBuildCenter(x, y, region, Pal.accent, rotation, progress);
-    }
-
-    public static void blockBuildCenter(float x, float y, TextureRegion region, Color color, float rotation, float progress){
-        blockBuildCenter.region = region;
-        blockBuildCenter.progress = progress;
-
-        Draw.color(color);
-        Draw.shader(blockBuildCenter);
-        Draw.rect(region, x, y, rotation);
-        Draw.shader();
-        Draw.color();
-    }
-
-    public static void vertConstruct(float x, float y, TextureRegion region, float rotation, float progress, float alpha, float time){
-        vertConstruct(x, y, region, Pal.accent, rotation, progress, alpha, time);
-    }
-
-    public static void vertConstruct(float x, float y, TextureRegion region, Color color, float rotation, float progress, float alpha, float time){
-        vertBuild.region = region;
-        vertBuild.progress = progress;
-        vertBuild.color.set(color);
-        vertBuild.color.a = alpha;
-        vertBuild.time = -time / 20f;
-
-        shader(vertBuild);
-        rect(region, x, y, rotation);
-        shader();
-
-        reset();
-    }
-
-    public static void materialize(float x, float y, TextureRegion region, Color color, float rotation, float offset, float progress){
-        materialize(x, y, region, color, rotation, offset, progress, Time.time, false);
-    }
-
-    public static void materialize(float x, float y, TextureRegion region, Color color, float rotation, float offset, float progress, boolean shadow){
-        materialize(x, y, region, color, rotation, offset, progress, Time.time, shadow);
-    }
-
-    public static void materialize(float x, float y, TextureRegion region, Color color, float rotation, float offset, float progress, float time){
-        materialize(x, y, region, color, rotation, offset, progress, time, false);
-    }
-
-    public static void materialize(float x, float y, TextureRegion region, Color color, float rotation, float offset, float progress, float time, boolean shadow){
-        materialize.region = region;
-        materialize.progress = Mathf.clamp(progress);
-        materialize.color.set(color);
-        materialize.time = time;
-        materialize.offset = offset;
-        materialize.shadow = Mathf.num(shadow);
-
-        shader(materialize);
-        rect(region, x, y, rotation);
-        shader();
-
-        reset();
-    }
-
-    private static void drawSpinSprite(TextureRegion[] regions, float x, float y, float w, float h, float r){
-        float ar = mod(r, 360f);
-
-        alpha(1f);
-        if(ar > 45f && ar <= 225f){
-            rect(regions[0], x, y, w, h * -1f, r);
-        }else{
-            rect(regions[0], x, y, w, h, r);
-        }
-
-        if(ar >= 180 && ar < 270){ //Bottom Left
-            float a = Interp.slope.apply(Mathf.curve(ar, 180, 270));
-            alpha(a);
-            rect(regions[1], x, y, w, h, r);
-        }else if(ar < 90 && ar >= 0){ //Top Right
-            float a = Interp.slope.apply(Mathf.curve(ar, 0, 90));
-            alpha(a);
-            rect(regions[2], x, y, w, h, r);
-        }
-        alpha(1f);
-    }
-
-    /** Draws a sprite that should be light-wise correct. Provided sprites must be similar in shape and face towards the right. */
-    public static void spinSprite(TextureRegion[] regions, float x, float y, float w, float h, float r, float alpha){
-        float xScl = xscl, yScl = yscl;
-        if(alpha < 0.99f){
-            FrameBuffer buffer = renderer.effectBuffer;
-            float z = Draw.z();
-            Draw.draw(z, () -> {
-                buffer.begin(Color.clear);
-                drawSpinSprite(regions, x, y, w * xScl, h * yScl, r);
-                buffer.end();
-
-                alphaShader.alpha = alpha;
-                buffer.blit(alphaShader);
-            });
-        }else{
-            drawSpinSprite(regions, x, y, w * xScl, h * yScl, r);
-        }
-    }
-
-    /** Draws a sprite that should be light-wise correct. Provided sprites must be similar in shape and face towards the right. */
-    public static void spinSprite(TextureRegion[] regions, float x, float y, float w, float h, float r){
-        spinSprite(regions, x, y, w, h, r, 1f);
-    }
-
-
-    /** Draws a sprite that should be light-wise correct. Provided sprites must be similar in shape and face towards the right. */
-    public static void spinSprite(TextureRegion[] regions, float x, float y, float r, float alpha){
-        spinSprite(regions, x, y, regions[0].width / 4f, regions[0].height / 4f, r, alpha);
-    }
-
-    /** Draws a sprite that should be light-wise correct. Provided sprites must be similar in shape and face towards the right. */
-    public static void spinSprite(TextureRegion[] regions, float x, float y, float r){
-        spinSprite(regions, x, y, regions[0].width / 4f, regions[0].height / 4f, r);
     }
 
     public static void ellipse(float x, float y, float rad, float wScl, float hScl, float rot){
@@ -471,21 +346,6 @@ public class ArikothDrawf{
         return width;
     }
 
-    public static void tractorCone(float cx, float cy, float time, float spacing, float thickness, Runnable draw){
-        FrameBuffer buffer = renderer.effectBuffer;
-        float z = Draw.z();
-        Draw.draw(z, () -> {
-            buffer.begin(Color.clear);
-            draw.run();
-            buffer.end();
-
-            tractorCone.setCenter(cx, cy);
-            tractorCone.time = time;
-            tractorCone.spacing = spacing;
-            tractorCone.thickness = thickness;
-            buffer.blit(tractorCone);
-        });
-    }
     public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float alpha, float time){
         construct(x, y, region, Pal.accent, rotation, progress, alpha, time);
     }

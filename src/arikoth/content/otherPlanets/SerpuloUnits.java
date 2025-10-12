@@ -1,43 +1,22 @@
 package arikoth.content.otherPlanets;
 
-import arc.Core;
-import arc.graphics.Blending;
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
-import arc.math.Interp;
-import arc.math.Mathf;
-import arc.math.geom.Rect;
-import arc.util.Tmp;
-import arikoth.content.ArikothFx;
-import arikoth.math.Parallax;
-import arikoth.palettes.ArikothUnitPal;
 import arikoth.palettes.VanillaPal;
 import arikoth.world.entities.bullets.*;
-import arikoth.world.type.LightEngine;
-import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.abilities.MoveEffectAbility;
 import mindustry.entities.bullet.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
-import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
-import mindustry.type.unit.MissileUnitType;
-import mindustry.type.unit.TankUnitType;
-import mindustry.type.weapons.RepairBeamWeapon;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.randLenVectors;
-import static arikoth.content.ArikothFx.rand;
-import static arikoth.content.ArikothFx.temp;
 import static mindustry.content.Fx.*;
 import static mindustry.gen.Sounds.*;
 

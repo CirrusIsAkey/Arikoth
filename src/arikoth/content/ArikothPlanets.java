@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import arikoth.content.blocks.ArikothStorage;
 import arikoth.content.otherPlanets.SerpuloBlocks;
 import arikoth.planet.maps.ColorPass;
 import arikoth.planet.maps.HeightPass;
@@ -79,7 +80,7 @@ public class ArikothPlanets {
             clearSectorOnLose = true;
             allowWaves = true;
             prebuildBase = false;
-            defaultCore = ArikothBlocks.coreSerenity;
+            defaultCore = ArikothStorage.coreSerenity;
 
             defaultEnv = ArikothEnv.desert | Env.oxygen | Env.terrestrial | Env.groundOil;
 
@@ -89,7 +90,7 @@ public class ArikothPlanets {
             rotateTime = 12 * 60;
 
             atmosphereRadIn = 0;
-            atmosphereRadOut = 0.3f;
+            atmosphereRadOut = 0.38f;
             sectorSeed = 1204;
             bloom = false;
             visible = true;
@@ -100,7 +101,7 @@ public class ArikothPlanets {
             ruleSetter = r -> {
                 r.waveTeam = ArikothTeams.conquisitoris;
                 r.showSpawns = true;
-                r.defaultTeam = Team.malis;
+                r.defaultTeam = ArikothTeams.luxis;
                 r.teams.get(r.waveTeam).rtsAi = false;
 
                 r.weather.addAll(
@@ -111,18 +112,6 @@ public class ArikothPlanets {
                 }
             };
         }};
-        zealor = makeAsteroid("zealor", ArikothPlanets.arikoth, Blocks.ferricStoneWall, ArikothBlocks.weatheredRheniumWall, -2, 0.55f, 6, 1.3f, gen -> {
-            gen.berylChance = 0.8f;
-            gen.iceChance = 0f;
-            gen.carbonChance = 0.01f;
-            gen.max += 2;
-        });
-        hypheru = makeAsteroid("hypheru", ArikothPlanets.arikoth, Blocks.ferricStoneWall, ArikothBlocks.weatheredRheniumWall, 11, 0.55f, 12, 1.3f, gen -> {
-            gen.berylChance = 0.8f;
-            gen.iceChance = 0f;
-            gen.carbonChance = 0.01f;
-            gen.max += 2;
-        });
 
         ghereon = new Planet("Ghereon", Planets.sun, 2f, 3){{
             generator = new GhereonPlanetGenerator();
@@ -144,7 +133,7 @@ public class ArikothPlanets {
             clearSectorOnLose = true;
             allowWaves = true;
             prebuildBase = false;
-            defaultCore = ArikothBlocks.coreSerenity;
+            defaultCore = Blocks.coreShard;
 
             defaultEnv = ArikothEnv.corrupted | Env.oxygen | Env.terrestrial | Env.groundOil;
 

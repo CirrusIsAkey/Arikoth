@@ -5,7 +5,7 @@ import arc.graphics.Color;
 public class ArikothUnitPal {
     public static Color
 
-            unitOutline = Color.valueOf("#241d1b"),
+            unitOutline = Color.valueOf("#2e2f36"),
             turretOutline = Color.valueOf("#302926"),
             arikothUnitHeat = Color.valueOf("#ff0000"),
     //unit palettes
