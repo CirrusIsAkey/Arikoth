@@ -17,7 +17,7 @@ Lao_Hua-Ji
 main: "arikoth.Arikoth"
 
 #the mod description as seen in the mod dialog
-description: "Arikoth mod, wip."
+description: "Arikoth mod, wip, not meant to be played, lacks a campaign, go mess around with stuff in sandbox :3"
 
 #the mod version
 version: 0.0.1
