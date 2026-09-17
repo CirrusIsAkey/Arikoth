@@ -6,14 +6,12 @@ import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.Texture;
 import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.math.Rand;
 import arc.util.Time;
 import mindustry.graphics.Layer;
-import mindustry.graphics.Shaders;
 import mindustry.type.Weather;
-import arikoth.world.meta.ArikothEnv;
+import arikoth.world.presets.misc.ArikothEnv;
 
 import static mindustry.Vars.*;
 
@@ -24,13 +22,18 @@ public class EnvRenderer {
 
         renderer.addEnvRenderer(ArikothEnv.desert, () -> {
             Texture tex = Core.assets.get("sprites/distortAlpha.png", Texture.class);
+
+            Color haze = Color.valueOf("cf8034");
+
             if(tex.getMagFilter() != Texture.TextureFilter.linear){
                 tex.setFilter(Texture.TextureFilter.linear);
                 tex.setWrap(Texture.TextureWrap.repeat);
             }
 
             Draw.z(state.rules.fog ? Layer.legUnit + 10 : Layer.effect);
-            Weather.drawNoiseLayers(tex, Color.valueOf("ffad4d"), 1000f, 0.1f, 1.2f, 1.5f, 1f, 0f, 4, -0.3f, 0.02f, 0.8f, 0.9f);
+            Weather.drawNoiseLayers(tex, haze, 1000f, 0.25f, 1.2f, 2f, 1f, 0f, 6, -0.3f, 0.02f, 0.8f, 0.9f);
+
+            Weather.drawNoiseLayers(tex, haze, 2000f, 0.1f, 1.2f, 2f, 1f, 0f, 6, -0.3f, 0.02f, 0.8f, 0.9f);
             Draw.reset();
         });
 

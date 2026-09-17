@@ -28,12 +28,12 @@ public class RotaryImpactDrill extends BurstDrill {
         arrowBlurRegions = new TextureRegion[arrows];
 
         for(int i=0; i < arrows ;i++){
-            arrowRegions[i] = Core.atlas.find(name + "-arrows-" + (arrows-1-i));
+            arrowRegions[i] = Core.atlas.find(name + "-arrow" + (arrows-1-i));
             arrowBlurRegions[i] = Core.atlas.find(name + "-arrow-glow-" + (arrows-1-i));
         }
     }
 
-    public class RotatyImpactDrillBuild extends BurstDrillBuild {
+    public class RotaryImpactDrillBuild extends BurstDrillBuild {
 
         public void draw(){
             Draw.rect(region, x, y);
@@ -61,9 +61,9 @@ public class RotaryImpactDrill extends BurstDrill {
                 //TODO maybe just use arrow alpha and draw gray on the base?
                 Draw.z(Layer.blockAdditive);
                 Draw.blend(Blending.additive);
-                Draw.color(baseArrowColor, dominantItem.color, a);
+                Draw.color(baseArrowColor, arrowColor, a);
                 Draw.rect(arrowRegions[j], x, y);
-                Draw.color(dominantItem.color);
+                Draw.color(arrowColor);
                 Draw.blend();
 
                 if(arrowBlurRegion.found()){

@@ -2,13 +2,13 @@ package arikoth.world.entities.bullets;
 
 import arc.util.Time;
 import arc.util.Tmp;
-import arikoth.util.utils;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.gen.Bullet;
 import mindustry.gen.Posc;
 import mindustry.gen.Unitc;
 import mindustry.logic.Ranged;
 import mindustry.world.blocks.defense.turrets.Turret;
+import arikoth.util.*;
 
 //author @idk rn
 
@@ -29,8 +29,8 @@ public class AimBulletType extends BasicBulletType {
         if(!(b.owner instanceof Ranged)) return;
         Tmp.v1.set(b.x, b.y);
 
-        if(b.owner instanceof utils.Targeting){
-            Tmp.v1.set(((utils.Targeting) b.owner).targetPos());
+        if(b.owner instanceof Utils.Targeting){
+            Tmp.v1.set(((Utils.Targeting) b.owner).targetPos());
         }
         else if(b.owner instanceof Turret.TurretBuild) {
             Tmp.v1.set(((Turret.TurretBuild) b.owner).targetPos.x, ((Turret.TurretBuild) b.owner).targetPos.y);

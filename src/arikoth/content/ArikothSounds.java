@@ -3,50 +3,50 @@ package arikoth.content;
 import arc.Core;
 import arc.assets.AssetDescriptor;
 import arc.assets.loaders.SoundLoader;
-import arc.audio.*;
+import arc.audio.Sound;
+import arc.util.Log;
 import mindustry.Vars;
+
+import java.lang.reflect.Field;
 
 public class ArikothSounds {
 
     public static Sound
-            laserShoot = new Sound(),
-            weakGun = new Sound(),
-            weakGunTwo = new Sound(),
-            rotorWhir = new Sound(),
-            smallShot = new Sound(),
-            steamHiss = new Sound(),
-            plasmaBoomAlt = new Sound(),
-            sniperShot = new Sound();
+            sniperShot, smallShoot, smallShot, scifiCannon, scifiExplosion, arikothMediumCannon,
+            voidBeam, voidCharge, laserCharge3, voidShot,
+            plasmaCannon, kathunk, plasma, warp,
+            shootArtilleryIncendiary, shootArtilleryIncendiarySmall, shootArtilleryIncendiaryLarge,
+            thermalBeam,
+            shootReckon, loopUnnamed2,
+            weakGunTwo, kaping, plasmaExplode, podLand
 
 
-    public static void load(){
-        laserShoot = loadSound("laserShoot");
-        weakGun = loadSound("weakGun");
-        weakGunTwo = loadSound("weakGunTwo");
-        rotorWhir = loadSound("rotorWhir");
-        smallShot = loadSound("smallShot");
-        steamHiss = loadSound("steamHiss");
-        plasmaBoomAlt = loadSound("plasmaBoomAlt");
-        sniperShot = loadSound("sniperShot");
+
+            ;
+
+    public static void load() {
+        try {
+            for (Field field : ArikothSounds.class.getFields()) {
+                if (field.getType().equals(Sound.class)) {
+                    field.set(null, loadSound(field.getName()));
+                }
+            }
+        } catch (IllegalAccessException e) {
+            Log.err(e);
+        }
     }
 
-
-    public static Sound loadSound(String soundName){
-        //taken from Omaloon, please support this mod -> https://github.com/xstabux/Omaloon/blob/master/src/omaloon/content/OlSounds.java
-        //making sure it doesn't load serverside
-        if(!Vars.headless) {
-            String name = "sounds/" + soundName;
-            String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
-
-            Sound sound = new Sound();
-
-            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundLoader.SoundParameter(sound));
-            desc.errored = Throwable::printStackTrace;
-
-            return sound;
-
-        } else {
+    private static Sound loadSound(String soundName) {
+        if (Vars.headless) {
             return new Sound();
         }
+
+        String path = "sounds/" + soundName;
+        String filePath = Vars.tree.get(path + ".ogg").exists() ? path + ".ogg" : path + ".mp3";
+
+        Sound sound = new Sound();
+        AssetDescriptor<?> desc = Core.assets.load(filePath, Sound.class, new SoundLoader.SoundParameter(sound));
+        desc.errored = Throwable::printStackTrace;
+        return sound;
     }
 }

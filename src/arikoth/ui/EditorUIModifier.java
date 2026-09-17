@@ -15,6 +15,7 @@ import static mindustry.Vars.*;
 //author @Andromeda
 
 public class EditorUIModifier {
+
     public static void modify(){
         ui.editor.shown(() -> {
             Table cont = (Table) ui.editor.getChildren().get(0);
@@ -26,6 +27,8 @@ public class EditorUIModifier {
                 t.button("@editor.arikoth-cliffs", Icon.terrain, Styles.flatt, EditorUIModifier::processCliffs).growX().margin(9f);
             }).growX().top();
         });
+
+
     }
 
     public static void addTeamButton(Table table, Team team){

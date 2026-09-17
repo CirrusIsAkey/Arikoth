@@ -26,7 +26,9 @@ public class ArikothPlanetGenerator extends PlanetGenerator {
     public void getColor(Vec3 position, Color out) {
         float height = getHeight(position);
         Block block;
-        if (height < 0.14f) {
+        if (height < 0.12f) {
+            block = ArikothEnv.paleRegolith;
+        } else if (height < 0.14f) {
             block = Blocks.sand;
         } else if (height < 0.16f) {
             block = Blocks.darksand;
@@ -34,20 +36,6 @@ public class ArikothPlanetGenerator extends PlanetGenerator {
         block = Blocks.carbonStone;
         } else if (height < 0.25) {
             block = Blocks.ferricStone;
-        } else if (height < 0.4) {
-            block = ArikothEnv.aerenite;
-        } else if (height < 0.45) {
-            block = ArikothEnv.paleAerenite;
-        } else if (height < 0.5) {
-            block = ArikothEnv.graystone;
-        } else if (height < 0.48) {
-            block = ArikothEnv.volcanicAndesite;
-        } else if (height < 0.6) {
-            block = Blocks.dacite;
-        } else if (height < 0.62) {
-            block = ArikothEnv.greenmat;
-        } else if (height < 0.63) {
-            block = Blocks.ice;
         } else {
             block = Blocks.carbonStone;
         }

@@ -2,16 +2,11 @@ package arikoth.world.blocks.env;
 
 import arc.graphics.Color;
 import arc.math.Mathf;
-import arc.util.Time;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.graphics.Pal;
 import mindustry.world.Tile;
-import mindustry.world.blocks.environment.Floor;
-
-import static mindustry.Vars.tilesize;
-import static mindustry.gen.Iconc.effect;
 
 public class EffectFloor extends AFloor {
 

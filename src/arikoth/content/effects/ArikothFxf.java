@@ -7,6 +7,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.graphics.g2d.TextureRegion;
+import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.util.Tmp;
@@ -24,10 +25,11 @@ public class ArikothFxf {
     public static Effect
         glowEffect = new Effect(0, e -> {
           Draw.z(Layer.floor);
+          rand.setSeed(e.id);
           Tile t = Vars.world.tileWorld(e.x, e.y);
           if(t.block() != Blocks.air) return;
           TextureRegion region = (TextureRegion) e.data;
-          Draw.alpha(e.fslope() * e.fslope());
+          Draw.alpha(rand.random(0.5f, 1) * e.fslope() * e.fin(Interp.smoother));
           Draw.rect(region, e.x, e.y, e.rotation);
           Draw.blend(Blending.additive);
           Draw.rect(region, e.x, e.y, e.rotation);

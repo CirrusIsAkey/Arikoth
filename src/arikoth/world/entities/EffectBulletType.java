@@ -7,7 +7,7 @@ import mindustry.gen.Bullet;
 
 //author @Sh1penfire
 
-public class EffectBulletType extends BulletType{
+public class EffectBulletType extends BulletType {
     public EffectBulletType(float lifetime){
         super();
         this.lifetime = lifetime;

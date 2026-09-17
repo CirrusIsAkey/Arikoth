@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.Tmp;
 import arc.util.noise.*;
-import arikoth.content.ArikothBlocks;
 import mindustry.content.Blocks;
 import mindustry.maps.generators.PlanetGenerator;
 import mindustry.world.Block;

@@ -3,17 +3,11 @@ package arikoth.world.blocks.storage;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arikoth.content.effects.ArikothMiscFx;
 import arikoth.graphics.ArikothDrawf;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.storage.*;
-import arc.graphics.*;
-import arc.scene.ui.layout.*;
-
-import static mindustry.Vars.renderer;
-import static mindustry.Vars.tilesize;
 
 public class ArikothCoreBlock extends CoreBlock{
     public float spawnCooldown = 2f * 60f;

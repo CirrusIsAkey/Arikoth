@@ -10,6 +10,9 @@ import mindustry.Vars;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+
+import static arc.Core.input;
+
 //author @Andromeda
 public class ACliff extends Prop {
     public TextureRegion[] lightRegions;
@@ -18,7 +21,7 @@ public class ACliff extends Prop {
 
     public ACliff(String name) {
         super(name);
-        breakable = alwaysReplace = false;
+        breakable = alwaysReplace = unitMoveBreakable = false;
         solid = true;
         fillsTile = false;
         hasShadow = false;
@@ -47,17 +50,21 @@ public class ACliff extends Prop {
     }
 
     public Color getColor(Tile tile){
-        if(tile.floor() instanceof AFloor sFloor && sFloor.cliffLightColor != null){
-            return sFloor.cliffLightColor;
-        }else{
+        if(tile.floor() instanceof AFloor AFloor && AFloor.cliffLightColor != null){
+            return AFloor.cliffLightColor;
+        } else if (tile.floor() instanceof AEdgeFloor AEdgeFloor && AEdgeFloor.cliffLightColor != null){
+            return AEdgeFloor.cliffLightColor;
+        } else{
             return Tmp.c1.set(tile.floor().mapColor).mul(1.6f);
         }
     }
 
     public Color getDarkColor(Tile tile){
-        if(tile.floor() instanceof AFloor sFloor && sFloor.cliffDarkColor != null){
-            return sFloor.cliffDarkColor;
-        }else{
+        if(tile.floor() instanceof AFloor AFloor && AFloor.cliffDarkColor != null){
+            return AFloor.cliffDarkColor;
+        } else if (tile.floor() instanceof AEdgeFloor AEdgeFloor && AEdgeFloor.cliffDarkColor != null){
+            return AEdgeFloor.cliffDarkColor;
+        } else{
             return Tmp.c1.set(tile.floor().mapColor).mul(0.7f);
         }
     }

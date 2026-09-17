@@ -1,99 +1,107 @@
 package arikoth.content;
 
 import arc.graphics.*;
-import arc.struct.*;
 import mindustry.type.*;
 
 public class ArikothItems {
     public static Item
-            //metals
-            rust, aluminum, iron, sodium,
-            //rocks
-            cryolite, magnetite, limestone, halite,
-            //alloys
-            steel, amalgam,
-            //non-metals
-            algalChunk, sulfur, boron,
-            //manufactured
-            thermite, gunpowder, blastPowder,
+            vanadium, tantalum, regolith, aTungsten, rhenium, lithium, crystallineIcher,
+    //ores
+            technoFossil, rheniite, kunzite, vanathite,
+    //non metals + metalloid
+            anthracite, aSilicon, sulfur,
+
+    //ammo
+            chaingunRound, chemicalChaingunRound,
+            explosiveArtilleryShell, incendiaryArtilleryShell, APArtilleryShell,
+            howitzerShell, chemicalHowitzerShell, fragmentaryShell,
+
+            flashGrenade,
             end;
 
     public static void load() {
-        rust = new Item("rust", Color.valueOf("#f2dba7")) {{
-            hardness = 1;
+        vanadium = new Item("vanadium", Color.valueOf("#cf9f7a")) {{
+            hardness = 2;
             cost = 1f;
         }};
-        aluminum = new Item("aluminum", Color.valueOf("#999ba1")) {{
-            hardness = 1;
-            cost = 1.5f;
+        tantalum = new Item("tantalum", Color.valueOf("#ab9693")) {{
+            hardness = 2;
+            cost = 1f;
         }};
-        iron = new Item("iron", Color.valueOf("#c4a7c1")) {{
+        regolith = new Item("regolith", Color.valueOf("#fff0cf")) {{
             hardness = 1;
-            cost = 1.5f;
+            cost = 0.5f;
+            lowPriority = true;
         }};
-        sodium = new Item("sodium", Color.valueOf("#b4adcc")) {{
-            hardness = 1;
-            cost = 2f;
-            explosiveness = 0.2f;
-            flammability = 0.05f;
+        rhenium = new Item("rhenium", Color.valueOf("c7a176")) {{
+            hardness = 3;
+            cost = 1f;
         }};
-        // // // region rocks // // //
-        cryolite = new Item("cryolite", Color.valueOf("666469")) {{
-            cost = 1;
-            hardness = 1;
+        aTungsten = new Item("aTungsten", Color.valueOf("8e9094")) {{
+            hardness = 3;
+            cost = 1f;
         }};
-        magnetite = new Item("magnetite", Color.valueOf("666469")) {{
-            cost = 1;
-            hardness = 1;
-        }};
-        limestone = new Item("limestone", Color.valueOf("f0dfca")) {{
-            cost = 1;
-            hardness = 1;
-        }};
-        halite = new Item("halite", Color.valueOf("b5b3ae")) {{
-            cost = 1;
-            hardness = 1;
-        }};
-        // // // region alloys // // //
-        steel = new Item("steel", Color.valueOf("7d7d7d")) {{
-            cost = 3.5f;
-            hardness = 1;
-        }};
-        amalgam = new Item("amalgam", Color.valueOf("cebee8")) {{
-            cost = 3.5f;
-            hardness = 1;
+        lithium = new Item("lithium", Color.valueOf("b35f54")) {{
+            hardness = 2;
+            cost = 1f;
+            flammability = 1.2f;
+            explosiveness = 1.5f;
             charge = 0.05f;
         }};
-        // // // region non metals // // //
-        algalChunk = new Item("algal-chunk", Color.valueOf("75515e")) {{
-            cost = 1.2f;
-            hardness = 1;
-            flammability = 0.2f;
-        }};
-        sulfur = new Item("sulfur", Color.valueOf("75515e")) {{
-            cost = 1.6f;
-            hardness = 1;
-            flammability = 0.12f;
-            explosiveness = 0.08f;
-        }};
-        boron = new Item("boron", Color.valueOf("dadbbd")) {{
-            cost = 2f;
+        crystallineIcher = new Item("crystalline-icher", Color.valueOf("ede480")) {{
             hardness = 2;
+            cost = 1f;
+            explosiveness = 0.2f;
         }};
-        // // // region manufactured // // //
-        thermite = new Item("thermite", Color.valueOf("ffc47d")) {{
-            cost = 3f;
-            flammability = 1.8f;
+
+        //ore
+
+        technoFossil = new Item("techno-fossil", Color.valueOf("707375")) {{
+            hardness = 2;
+            cost = 1f;
         }};
-        gunpowder = new Item("gunpowder", Color.valueOf("606060")) {{
-            cost = 3f;
-            flammability = 0.2f;
-            explosiveness = 0.8f;
+        rheniite = new Item("rheniite", Color.valueOf("#404040")) {{
+            hardness = 1;
+            cost = 0.5f;
         }};
-        blastPowder = new Item("blastpowder", Color.valueOf("ff8c7d")) {{
-            cost = 3f;
-            flammability = 0.05f;
-            explosiveness = 2.1f;
+        kunzite = new Item("kunzite", Color.valueOf("#a67c9a")) {{
+            hardness = 1;
+            cost = 0.5f;
+        }};
+        vanathite = new Item("vanathinite", Color.valueOf("#9e4f4f")) {{
+            hardness = 1;
+            cost = 0.5f;
+            explosiveness = 1.5f;
+            flammability = 0.5f;
+        }};
+
+        //non-metal
+
+        anthracite = new Item("anthracite", Color.valueOf("#606060")) {{
+            hardness = 1;
+            cost = 0.5f;
+            flammability = 1.2f;
+        }};
+        aSilicon = new Item("aSilicon", Color.valueOf("9b9dab")) {{
+            hardness = 1;
+            cost = 2f;
+        }};
+        sulfur = new Item("sulfur", Color.valueOf("e8d974")) {{
+            hardness = 1;
+            cost = 2f;
+            flammability = 0.5f;
+        }};
+
+        //ammo
+        chaingunRound = new Item("chaingun-round", Color.valueOf("d66767")) {{
+            hardness = 1;
+            cost = 2f;
+            explosiveness = 1.25f;
+        }};
+        chemicalChaingunRound = new Item("chemical-chaingun-round", Color.valueOf("e8d974")) {{
+            hardness = 1;
+            cost = 2f;
+            explosiveness = 0.5f;
         }};
     }
 }

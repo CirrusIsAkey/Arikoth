@@ -23,11 +23,7 @@ description: "Arikoth mod, wip."
 version: 0.0.1
 
 #the minimum game build required to run this mod
-minGameVersion: 150
+minGameVersion: 155
 
 #this is a java mod
 java: true
-
-dependencies : [
-"font-icon-lib"
-]
